@@ -317,6 +317,9 @@ Public Class MainForm
             BCDEditProcess.StartInfo.Arguments = "/set {bootmgr} bootmenupolicy legacy"
             BCDEditProcess.Start()
             BCDEditProcess.WaitForExit()
+            BCDEditProcess.StartInfo.Arguments = "/set {bootmgr} timeout 3"
+            BCDEditProcess.Start()
+            BCDEditProcess.WaitForExit()
 
             ' Configure RAMDisk Settings
             ProgressMessage = "Updating RAMDisk configuration..."
