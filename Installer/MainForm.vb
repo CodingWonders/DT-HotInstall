@@ -299,6 +299,13 @@ Public Class MainForm
         End Try
     End Sub
 
+    Public Function RunBCDConfigurator(Arguments As String) As Integer
+        BCDEditProcess.StartInfo.Arguments = Arguments
+        BCDEditProcess.Start()
+        BCDEditProcess.WaitForExit()
+        Return BCDEditProcess.ExitCode
+    End Function
+
     Sub RunBCDConfiguration()
         Try
             BCDEditProcess.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "system32", "bcdedit.exe")
@@ -308,34 +315,18 @@ Public Class MainForm
             ' Configure bootmgr to use legacy view
             ProgressMessage = "Preparing to update boot configuration..."
             InstallerBW.ReportProgress(20)
-            BCDEditProcess.StartInfo.Arguments = "/set {default} bootmenupolicy legacy"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set {current} bootmenupolicy legacy"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set {bootmgr} bootmenupolicy legacy"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set {bootmgr} timeout 3"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
+            RunBCDConfigurator("/set {default} bootmenupolicy legacy")
+            RunBCDConfigurator("/set {current} bootmenupolicy legacy")
+            RunBCDConfigurator("/set {bootmgr} bootmenupolicy legacy")
+            RunBCDConfigurator("/set {bootmgr} timeout 3")
 
             ' Configure RAMDisk Settings
             ProgressMessage = "Updating RAMDisk configuration..."
             InstallerBW.ReportProgress(25)
-            BCDEditProcess.StartInfo.Arguments = "/create {ramdiskoptions}"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set {ramdiskoptions} ramdisksdidevice partition=" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim()
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set {ramdiskoptions} ramdisksdipath \$DISMTOOLS.~BT\Boot\boot.sdi"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/deletevalue {ramdiskoptions} description"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
+            RunBCDConfigurator("/create {ramdiskoptions}")
+            RunBCDConfigurator("/set {ramdiskoptions} ramdisksdidevice partition=" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim())
+            RunBCDConfigurator("/set {ramdiskoptions} ramdisksdipath \$DISMTOOLS.~BT\Boot\Boot.sdi")
+            RunBCDConfigurator("/deletevalue {ramdiskoptions} description")     ' Necessary to delete if description is already in ramdisksettings
 
             ' Create BCD Entry and grab GUID
             ProgressMessage = "Creating boot entry..."
@@ -355,35 +346,23 @@ Public Class MainForm
             ' Update BCD Entry
             ProgressMessage = "Configuring boot entry..."
             InstallerBW.ReportProgress(35)
-            BCDEditProcess.StartInfo.Arguments = "/set " & TargetGuid & " device ramdisk=[" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim() & "]\$DISMTOOLS.~BT\sources\boot.wim,{ramdiskoptions}"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set " & TargetGuid & " path \Windows\system32\Boot\winload.efi"      ' TODO: detect BIOS/UEFI
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set " & TargetGuid & " locale en-US"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set " & TargetGuid & " osdevice ramdisk=[" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim() & "]\$DISMTOOLS.~BT\sources\boot.wim,{ramdiskoptions}"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set " & TargetGuid & " systemroot \Windows"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set " & TargetGuid & " detecthal Yes"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/set " & TargetGuid & " winpe Yes"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
+            Dim osloaderPath As String = ""
+            If Environment.GetEnvironmentVariable("FIRMWARE_TYPE") = "UEFI" Then
+                osloaderPath = "\Windows\system32\Boot\winload.efi"
+            Else
+                osloaderPath = "\Windows\system32\winload.exe"
+            End If
+            RunBCDConfigurator("/set " & TargetGuid & " device ramdisk=[" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim() & "]\$DISMTOOLS.~BT\sources\boot.wim,{ramdiskoptions}")
+            RunBCDConfigurator("/set " & TargetGuid & " osdevice ramdisk=[" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim() & "]\$DISMTOOLS.~BT\sources\boot.wim,{ramdiskoptions}")
+            RunBCDConfigurator("/set " & TargetGuid & " path " & osloaderPath)
+            RunBCDConfigurator("/set " & TargetGuid & " locale en-US")
+            RunBCDConfigurator("/set " & TargetGuid & " systemroot \Windows")
+            RunBCDConfigurator("/set " & TargetGuid & " detecthal Yes")
+            RunBCDConfigurator("/set " & TargetGuid & " winpe Yes")
             ProgressMessage = "Modifying display order..."
             InstallerBW.ReportProgress(38)
-            BCDEditProcess.StartInfo.Arguments = "/displayorder " & TargetGuid & " /addfirst"
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
-            BCDEditProcess.StartInfo.Arguments = "/default " & TargetGuid
-            BCDEditProcess.Start()
-            BCDEditProcess.WaitForExit()
+            RunBCDConfigurator("/displayorder " & TargetGuid & " /addfirst")
+            RunBCDConfigurator("/default " & TargetGuid)
 
         Catch ex As Exception
             Throw ex
