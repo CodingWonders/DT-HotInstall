@@ -260,6 +260,7 @@ Public Class MainForm
                 Dim destinationPath As String = Path.Combine(DestinationRoot, sourcePath)
                 File.Copy(FileToCopy, destinationPath, True)
                 CopiedFiles += 1
+                File.SetAttributes(destinationPath, FileAttributes.Archive)
             Next
         Catch ex As Exception
             Throw ex
