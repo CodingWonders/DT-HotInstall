@@ -15,7 +15,7 @@ Public Class MainForm
     Dim BootArchitecture As Integer
     Dim ComputerArchitecture As Integer
 
-    Dim BootMgrEntryName As String = "PE Helper BOOTMGR Bootstrapper (Codename HotInstall)"
+    Dim BootMgrEntryName As String = "DISMTools Operating System Installation"
     Dim SlideshowPicture As Integer = 0
 
     Dim ProgressMessage As String = ""
@@ -376,7 +376,7 @@ Public Class MainForm
         ProgressMessage = "Creating temporary directory and copying files..."
         InstallerBW.ReportProgress(5)
         CopyFiles(If(TestMode Or TestBCD, Application.StartupPath, Path.GetPathRoot(Application.StartupPath)), Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT"), "install.wim")
-        If TestMode Or TestBCD Then
+        If Not TestMode OrElse (TestMode AndAlso TestBCD) Then
             ' Leave bcdedit stuff out of test mode
             ProgressMessage = "Updating boot configuration..."
             InstallerBW.ReportProgress(20)
