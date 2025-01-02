@@ -15,10 +15,17 @@ Public Class MainForm
     Dim BootArchitecture As Integer
     Dim ComputerArchitecture As Integer
 
+    Dim BCDEntryTextLocation As String
+
     Dim BootMgrEntryName As String = "DISMTools Operating System Installation"
     Dim SlideshowPicture As Integer = 0
 
     Dim ProgressMessage As String = ""
+
+    Dim DismProgressPercentage As Integer = 0
+
+    ' Restart Timer
+    Dim TimeTaken As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         VerifyInPages.AddRange(New WizardPage.Page() {WizardPage.Page.DisclaimerPage, WizardPage.Page.ImageInfoPage})
@@ -63,6 +70,8 @@ Public Class MainForm
         If TestBCD Then
             Text &= " (BCD TEST MODE)"
         End If
+
+        TextBox3.Text = My.Resources.Licenses
 
     End Sub
 
@@ -278,6 +287,13 @@ Public Class MainForm
             Throw ex
         End Try
 
+        DismProgressPercentage = 0
+        Dim MountString As String
+        Dim UnmountString As String
+
+        MountString = ProgressMessage
+        UnmountString = ProgressMessage
+
         ' Proceed with the DISM operation
         Try
             DismApi.Initialize(DismLogLevel.LogErrors)
@@ -285,9 +301,17 @@ Public Class MainForm
                 If Index <= 0 Then
                     Throw New Exception("When mounting an image, the index must be greater than 0")
                 End If
-                DismApi.MountImage(ImageFile, MountDirectory, Index, False)
+                DismApi.MountImage(ImageFile, MountDirectory, Index, False, Sub(progress As DismProgress)
+                                                                                DismProgressPercentage = progress.Current
+                                                                                ProgressMessage = MountString & " (" & DismProgressPercentage & "%)"
+                                                                                InstallerBW.ReportProgress(ProgressBar1.Value)
+                                                                            End Sub)
             Else
-                DismApi.UnmountImage(MountDirectory, Commit)
+                DismApi.UnmountImage(MountDirectory, Commit, Sub(progress As DismProgress)
+                                                                 DismProgressPercentage = progress.Current / 2
+                                                                 ProgressMessage = UnmountString & " (" & DismProgressPercentage & "%)"
+                                                                 InstallerBW.ReportProgress(ProgressBar1.Value)
+                                                             End Sub)
             End If
         Catch ex As Exception
             Throw ex
@@ -342,7 +366,12 @@ Public Class MainForm
             Dim startIndex As Integer = TargetGuidOutput.IndexOf("{")
             Dim endIndex As Integer = TargetGuidOutput.LastIndexOf("}")
             TargetGuid = TargetGuidOutput.Substring(startIndex, endIndex - startIndex + 1)
-            File.WriteAllText(Application.StartupPath & "\bcdguid.txt", TargetGuid)
+            If TestMode AndAlso TestBCD Then
+                BCDEntryTextLocation = Path.Combine(Application.StartupPath, "bcdguid.txt")
+            ElseIf Not TestMode Then
+                BCDEntryTextLocation = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "bcdguid.txt")
+            End If
+            File.WriteAllText(BCDEntryTextLocation, TargetGuid)
 
             ' Update BCD Entry
             ProgressMessage = "Configuring boot entry..."
@@ -390,7 +419,11 @@ Public Class MainForm
         ProgressMessage = "Performing customizations..."
         InstallerBW.ReportProgress(60)
         Try
-            File.WriteAllText(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~WS", "HotInstall"), "")
+            Dim HotInstallInfoPath As String = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~WS", "HotInstall")
+            If Not Directory.Exists(HotInstallInfoPath) Then
+                Directory.CreateDirectory(HotInstallInfoPath)
+            End If
+            File.WriteAllText(Path.Combine(HotInstallInfoPath, "BcdEntry"), File.ReadAllText(BCDEntryTextLocation))
         Catch ex As Exception
             Throw ex
         End Try
@@ -416,12 +449,14 @@ Public Class MainForm
     Private Sub InstallerBW_ProgressChanged(sender As Object, e As System.ComponentModel.ProgressChangedEventArgs) Handles InstallerBW.ProgressChanged
         Label19.Text = ProgressMessage
         ProgressBar1.Value = e.ProgressPercentage
+        Label34.Text = "API Progress: " & DismProgressPercentage & "%"
     End Sub
 
     Private Sub InstallerBW_RunWorkerCompleted(sender As Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles InstallerBW.RunWorkerCompleted
         If e.Error IsNot Nothing Then
             If e.Error.Message = "Preparation Finished" Then
                 SlideshowTimer.Enabled = False
+                Timer1.Enabled = True
                 ChangePage(CurrentWizardPage.InstallerWizardPage + 1)
                 Exit Sub
             End If
@@ -435,5 +470,15 @@ Public Class MainForm
                           "/r /t 0")
         End If
         Close()
+    End Sub
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        TimeTaken += 1
+        ProgressBar2.Value = TimeTaken * 10
+        Label35.Text = "Your computer will restart in " & (10 - TimeTaken) & " second" & If((10 - TimeTaken) = 1, "", "s") & "..."
+        If TimeTaken >= 10 Then
+            Timer1.Enabled = False
+            RestartButton.PerformClick()
+        End If
     End Sub
 End Class

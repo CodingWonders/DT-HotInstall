@@ -149,7 +149,11 @@ If this disc image does not contain the Windows image you want to test, exit the
   <data name="TextBox1.Text" xml:space="preserve">
     <value>The Preinstallation Environment (PE) Helper and all helper applications and scripts (such as the Driver Installation Module (DIM) and the HotInstall installer) are provided AS IS, without any warranty of any kind.
 
-We are not responsible for any damage done to your computer. Make sure to configure backups of your data.</value>
+We are not responsible for any damage done to your computer. Make sure to configure backups of your data.
+
+-- Notes regarding Ventoy drives:
+
+If you have started this installation using an ISO file from a Ventoy drive, you may not be able to install the operating system. Please make sure that the ISO file has been flashed to a USB drive.</value>
   </data>
   <data name="TextBox2.Text" xml:space="preserve">
     <value>This disc image, and any other disc images created with either DISMTools or the Preinstallation Environment (PE) Helper are meant for testing customized Windows images. This relies on you having a method to test the image, such as a spare system that could act as the test system, or a virtual machine.
@@ -164,5 +168,8 @@ While you can use these disc images for personal or business-related purposes, r
   </metadata>
   <metadata name="BCDEditProcess.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>267, 17</value>
+  </metadata>
+  <metadata name="Timer1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>404, 17</value>
   </metadata>
 </root>

@@ -30,8 +30,10 @@ Partial Class MainForm
         Me.ExitButton = New System.Windows.Forms.Button()
         Me.PageContainerPanel = New System.Windows.Forms.Panel()
         Me.FinishPanel = New System.Windows.Forms.Panel()
+        Me.ProgressBar2 = New System.Windows.Forms.ProgressBar()
         Me.RestartButton = New System.Windows.Forms.Button()
         Me.Label32 = New System.Windows.Forms.Label()
+        Me.Label35 = New System.Windows.Forms.Label()
         Me.Label33 = New System.Windows.Forms.Label()
         Me.InstallationPanel = New System.Windows.Forms.Panel()
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
@@ -54,6 +56,7 @@ Partial Class MainForm
         Me.Label29 = New System.Windows.Forms.Label()
         Me.Label30 = New System.Windows.Forms.Label()
         Me.Label31 = New System.Windows.Forms.Label()
+        Me.Label34 = New System.Windows.Forms.Label()
         Me.Label19 = New System.Windows.Forms.Label()
         Me.Label17 = New System.Windows.Forms.Label()
         Me.Label18 = New System.Windows.Forms.Label()
@@ -95,6 +98,7 @@ Partial Class MainForm
         Me.SlideshowTimer = New System.Windows.Forms.Timer(Me.components)
         Me.InstallerBW = New System.ComponentModel.BackgroundWorker()
         Me.BCDEditProcess = New System.Diagnostics.Process()
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.ButtonContainerPanel.SuspendLayout()
         Me.PageContainerPanel.SuspendLayout()
         Me.FinishPanel.SuspendLayout()
@@ -177,8 +181,10 @@ Partial Class MainForm
         '
         'FinishPanel
         '
+        Me.FinishPanel.Controls.Add(Me.ProgressBar2)
         Me.FinishPanel.Controls.Add(Me.RestartButton)
         Me.FinishPanel.Controls.Add(Me.Label32)
+        Me.FinishPanel.Controls.Add(Me.Label35)
         Me.FinishPanel.Controls.Add(Me.Label33)
         Me.FinishPanel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FinishPanel.Location = New System.Drawing.Point(0, 0)
@@ -186,6 +192,15 @@ Partial Class MainForm
         Me.FinishPanel.Size = New System.Drawing.Size(784, 525)
         Me.FinishPanel.TabIndex = 4
         Me.FinishPanel.Visible = False
+        '
+        'ProgressBar2
+        '
+        Me.ProgressBar2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ProgressBar2.Location = New System.Drawing.Point(17, 441)
+        Me.ProgressBar2.Name = "ProgressBar2"
+        Me.ProgressBar2.Size = New System.Drawing.Size(751, 23)
+        Me.ProgressBar2.TabIndex = 9
         '
         'RestartButton
         '
@@ -209,6 +224,19 @@ Partial Class MainForm
         Me.Label32.TabIndex = 7
         Me.Label32.Text = resources.GetString("Label32.Text")
         '
+        'Label35
+        '
+        Me.Label35.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label35.AutoEllipsis = True
+        Me.Label35.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label35.Location = New System.Drawing.Point(17, 410)
+        Me.Label35.Name = "Label35"
+        Me.Label35.Size = New System.Drawing.Size(751, 21)
+        Me.Label35.TabIndex = 6
+        Me.Label35.Text = "Your computer will restart in 10 seconds..."
+        Me.Label35.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'Label33
         '
         Me.Label33.AutoSize = True
@@ -223,6 +251,7 @@ Partial Class MainForm
         '
         Me.InstallationPanel.Controls.Add(Me.ProgressBar1)
         Me.InstallationPanel.Controls.Add(Me.StepPanelContainer)
+        Me.InstallationPanel.Controls.Add(Me.Label34)
         Me.InstallationPanel.Controls.Add(Me.Label19)
         Me.InstallationPanel.Controls.Add(Me.Label17)
         Me.InstallationPanel.Controls.Add(Me.Label18)
@@ -449,6 +478,19 @@ Partial Class MainForm
         Me.Label31.Text = "Verify that the target operating system works the way you want." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "If the customi" & _
     "zations were successful, go ahead and perform a bigger-scale deployment."
         '
+        'Label34
+        '
+        Me.Label34.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label34.AutoEllipsis = True
+        Me.Label34.Location = New System.Drawing.Point(493, 468)
+        Me.Label34.Name = "Label34"
+        Me.Label34.Size = New System.Drawing.Size(279, 15)
+        Me.Label34.TabIndex = 5
+        Me.Label34.Text = "API Progress: 0"
+        Me.Label34.TextAlign = System.Drawing.ContentAlignment.TopRight
+        Me.Label34.Visible = False
+        '
         'Label19
         '
         Me.Label19.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
@@ -543,6 +585,7 @@ Partial Class MainForm
         Me.ListView1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4, Me.ColumnHeader5})
         Me.ListView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ListView1.FullRowSelect = True
+        Me.ListView1.HideSelection = False
         Me.ListView1.Location = New System.Drawing.Point(3, 19)
         Me.ListView1.MultiSelect = False
         Me.ListView1.Name = "ListView1"
@@ -870,6 +913,10 @@ Partial Class MainForm
         Me.BCDEditProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
         Me.BCDEditProcess.SynchronizingObject = Me
         '
+        'Timer1
+        '
+        Me.Timer1.Interval = 1000
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -888,7 +935,7 @@ Partial Class MainForm
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "HotInstall OS Installer"
+        Me.Text = "DISMTools Operating System Installation"
         Me.TopMost = True
         Me.ButtonContainerPanel.ResumeLayout(False)
         Me.PageContainerPanel.ResumeLayout(False)
@@ -996,5 +1043,8 @@ Partial Class MainForm
     Friend WithEvents Label32 As System.Windows.Forms.Label
     Friend WithEvents Label33 As System.Windows.Forms.Label
     Friend WithEvents BCDEditProcess As System.Diagnostics.Process
-
+    Friend WithEvents Label34 As Label
+    Friend WithEvents ProgressBar2 As ProgressBar
+    Friend WithEvents Label35 As Label
+    Friend WithEvents Timer1 As Timer
 End Class

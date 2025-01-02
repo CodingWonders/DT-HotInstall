@@ -89,5 +89,20 @@ Namespace My.Resources
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
+        
+        '''<summary>
+        '''  Busca una cadena traducida similar a - HotInstall
+        '''
+        '''This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or at your option any later version.
+        '''
+        '''This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. 
+        '''
+        '''You should have re [resto de la cadena truncado]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property Licenses() As String
+            Get
+                Return ResourceManager.GetString("Licenses", resourceCulture)
+            End Get
+        End Property
     End Module
 End Namespace
