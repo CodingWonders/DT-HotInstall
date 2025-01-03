@@ -3,6 +3,7 @@ Imports System.IO
 Imports Microsoft.VisualBasic.ControlChars
 Imports System.Management
 Imports System.ComponentModel
+Imports System.Drawing
 
 Public Class MainForm
 
@@ -72,6 +73,13 @@ Public Class MainForm
         End If
 
         TextBox3.Text = My.Resources.Licenses
+
+        Dim ScreenBounds As Rectangle = Screen.PrimaryScreen.Bounds
+        StartPosition = FormStartPosition.Manual
+        Location = New Point(
+            (ScreenBounds.Width - Width) / 2,
+            (ScreenBounds.Height - Height) / 2
+            )
 
     End Sub
 
