@@ -17,6 +17,7 @@ if ($?) {
 	Remove-Item -Path "$((Get-Location).Path)\out\Installer\sources" -Recurse -Force -Verbose
 	
 	$infContents = @'
+
 [autorun]
 open=setup.exe
 icon=autorun.ico
