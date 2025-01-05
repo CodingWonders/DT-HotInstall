@@ -6,9 +6,10 @@
         ExplanationPage = 2
         InstallationPage = 3
         FinishPage = 4
+        FailurePage = 5
     End Enum
 
     Public Property InstallerWizardPage As Page
-    Public Const PageCount As Integer = 5
+    Public Const PageCount As Integer = 6
 
 End Class

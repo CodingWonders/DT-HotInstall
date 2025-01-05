@@ -99,6 +99,11 @@ Partial Class MainForm
         Me.InstallerBW = New System.ComponentModel.BackgroundWorker()
         Me.BCDEditProcess = New System.Diagnostics.Process()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.ErrorPanel = New System.Windows.Forms.Panel()
+        Me.Label36 = New System.Windows.Forms.Label()
+        Me.Label37 = New System.Windows.Forms.Label()
+        Me.ErrorTextBox = New System.Windows.Forms.TextBox()
+        Me.Label38 = New System.Windows.Forms.Label()
         Me.ButtonContainerPanel.SuspendLayout()
         Me.PageContainerPanel.SuspendLayout()
         Me.FinishPanel.SuspendLayout()
@@ -119,6 +124,7 @@ Partial Class MainForm
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
+        Me.ErrorPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'ButtonContainerPanel
@@ -168,6 +174,7 @@ Partial Class MainForm
         '
         'PageContainerPanel
         '
+        Me.PageContainerPanel.Controls.Add(Me.ErrorPanel)
         Me.PageContainerPanel.Controls.Add(Me.FinishPanel)
         Me.PageContainerPanel.Controls.Add(Me.InstallationPanel)
         Me.PageContainerPanel.Controls.Add(Me.ExplanationPanel)
@@ -264,7 +271,9 @@ Partial Class MainForm
         '
         'ProgressBar1
         '
-        Me.ProgressBar1.Location = New System.Drawing.Point(12, 490)
+        Me.ProgressBar1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ProgressBar1.Location = New System.Drawing.Point(12, 486)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(760, 23)
         Me.ProgressBar1.TabIndex = 7
@@ -480,10 +489,10 @@ Partial Class MainForm
         '
         'Label34
         '
-        Me.Label34.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.Label34.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label34.AutoEllipsis = True
-        Me.Label34.Location = New System.Drawing.Point(493, 468)
+        Me.Label34.Location = New System.Drawing.Point(493, 464)
         Me.Label34.Name = "Label34"
         Me.Label34.Size = New System.Drawing.Size(279, 15)
         Me.Label34.TabIndex = 5
@@ -493,10 +502,10 @@ Partial Class MainForm
         '
         'Label19
         '
-        Me.Label19.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.Label19.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Label19.AutoSize = True
-        Me.Label19.Location = New System.Drawing.Point(14, 468)
+        Me.Label19.Location = New System.Drawing.Point(14, 464)
         Me.Label19.Name = "Label19"
         Me.Label19.Size = New System.Drawing.Size(55, 15)
         Me.Label19.TabIndex = 5
@@ -917,6 +926,63 @@ Partial Class MainForm
         '
         Me.Timer1.Interval = 1000
         '
+        'ErrorPanel
+        '
+        Me.ErrorPanel.Controls.Add(Me.ErrorTextBox)
+        Me.ErrorPanel.Controls.Add(Me.Label38)
+        Me.ErrorPanel.Controls.Add(Me.Label37)
+        Me.ErrorPanel.Controls.Add(Me.Label36)
+        Me.ErrorPanel.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.ErrorPanel.Location = New System.Drawing.Point(0, 0)
+        Me.ErrorPanel.Name = "ErrorPanel"
+        Me.ErrorPanel.Size = New System.Drawing.Size(784, 525)
+        Me.ErrorPanel.TabIndex = 5
+        Me.ErrorPanel.Visible = False
+        '
+        'Label36
+        '
+        Me.Label36.AutoSize = True
+        Me.Label36.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label36.Location = New System.Drawing.Point(13, 13)
+        Me.Label36.Name = "Label36"
+        Me.Label36.Size = New System.Drawing.Size(165, 21)
+        Me.Label36.TabIndex = 7
+        Me.Label36.Text = "We ran into a problem"
+        '
+        'Label37
+        '
+        Me.Label37.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label37.Location = New System.Drawing.Point(14, 43)
+        Me.Label37.Name = "Label37"
+        Me.Label37.Size = New System.Drawing.Size(758, 72)
+        Me.Label37.TabIndex = 8
+        Me.Label37.Text = "Your computer could not be prepared to boot to the next stage of operating system" & _
+    " installation. Any changes made to your computer will be undone." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "See below fo" & _
+    "r reasons why this process has failed:"
+        '
+        'ErrorTextBox
+        '
+        Me.ErrorTextBox.BackColor = System.Drawing.Color.White
+        Me.ErrorTextBox.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ErrorTextBox.Location = New System.Drawing.Point(68, 126)
+        Me.ErrorTextBox.Multiline = True
+        Me.ErrorTextBox.Name = "ErrorTextBox"
+        Me.ErrorTextBox.ReadOnly = True
+        Me.ErrorTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.ErrorTextBox.Size = New System.Drawing.Size(649, 302)
+        Me.ErrorTextBox.TabIndex = 9
+        '
+        'Label38
+        '
+        Me.Label38.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label38.Location = New System.Drawing.Point(14, 439)
+        Me.Label38.Name = "Label38"
+        Me.Label38.Size = New System.Drawing.Size(758, 72)
+        Me.Label38.TabIndex = 8
+        Me.Label38.Text = resources.GetString("Label38.Text")
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -969,6 +1035,8 @@ Partial Class MainForm
         Me.TabPage2.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage3.PerformLayout()
+        Me.ErrorPanel.ResumeLayout(False)
+        Me.ErrorPanel.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1047,4 +1115,9 @@ Partial Class MainForm
     Friend WithEvents ProgressBar2 As ProgressBar
     Friend WithEvents Label35 As Label
     Friend WithEvents Timer1 As Timer
+    Friend WithEvents ErrorPanel As System.Windows.Forms.Panel
+    Friend WithEvents ErrorTextBox As System.Windows.Forms.TextBox
+    Friend WithEvents Label38 As System.Windows.Forms.Label
+    Friend WithEvents Label37 As System.Windows.Forms.Label
+    Friend WithEvents Label36 As System.Windows.Forms.Label
 End Class

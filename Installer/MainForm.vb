@@ -25,6 +25,8 @@ Public Class MainForm
 
     Dim DismProgressPercentage As Integer = 0
 
+    Dim CurrentStage As InstallationStage.InstallerStage
+
     ' Restart Timer
     Dim TimeTaken As Integer
 
@@ -163,8 +165,8 @@ Public Class MainForm
         Return True
     End Function
 
-    Sub ChangePage(NewPage As WizardPage.Page)
-        If NewPage > CurrentWizardPage.InstallerWizardPage AndAlso VerifyInPages.Contains(CurrentWizardPage.InstallerWizardPage) Then
+    Sub ChangePage(NewPage As WizardPage.Page, Optional Force As Boolean = False)
+        If NewPage > CurrentWizardPage.InstallerWizardPage AndAlso VerifyInPages.Contains(CurrentWizardPage.InstallerWizardPage) AndAlso Not Force Then
             If Not VerifyOptionsInPage(CurrentWizardPage.InstallerWizardPage) Then Exit Sub
         End If
 
@@ -173,10 +175,15 @@ Public Class MainForm
         ExplanationPanel.Visible = (NewPage = WizardPage.Page.ExplanationPage)
         InstallationPanel.Visible = (NewPage = WizardPage.Page.InstallationPage)
         FinishPanel.Visible = (NewPage = WizardPage.Page.FinishPage)
+        ErrorPanel.Visible = (NewPage = WizardPage.Page.FailurePage)
+
+        If NewPage = WizardPage.Page.InstallationPage Or NewPage = WizardPage.Page.FinishPage Then
+            ButtonContainerPanel.Visible = False
+        End If
 
         CurrentWizardPage.InstallerWizardPage = NewPage
 
-        BackButton.Enabled = Not (NewPage = WizardPage.Page.DisclaimerPage) And Not (NewPage = WizardPage.Page.FinishPage)
+        BackButton.Enabled = Not (NewPage = WizardPage.Page.DisclaimerPage) And Not ((NewPage = WizardPage.Page.FinishPage) Or (NewPage = WizardPage.Page.FailurePage))
         NextButton.Enabled = Not (NewPage = WizardPage.Page.FinishPage) And Not (NewPage + 1 >= WizardPage.PageCount)
         ExitButton.Enabled = Not (NewPage = WizardPage.Page.FinishPage)
 
@@ -189,8 +196,8 @@ Public Class MainForm
             InstallerBW.RunWorkerAsync()
         End If
 
-        If NewPage = WizardPage.Page.FinishPage Then
-            ButtonContainerPanel.Visible = False
+        If NewPage = WizardPage.Page.FailurePage Then
+            ControlBox = True           ' At least let the user close the window
         End If
     End Sub
 
@@ -200,10 +207,10 @@ Public Class MainForm
             If File.Exists(WindowsImage) Then
                 Return DismApi.GetImageInfo(WindowsImage)
             Else
-                Throw New Exception("The Windows image " & Quote & WindowsImage & Quote & " does not exist in the file system")
+                Throw New Exception("The Windows image " & Quote & WindowsImage & Quote & " does not exist in the file system", New Win32Exception(2))
             End If
         Catch ex As Exception
-            MsgBox(ex.Message, vbOKOnly + vbCritical, Text)
+            Throw ex
             Return Nothing
         Finally
             Try
@@ -221,7 +228,7 @@ Public Class MainForm
             Beep()
             Exit Sub
         End If
-        If CurrentWizardPage.InstallerWizardPage <> WizardPage.Page.FinishPage AndAlso MsgBox("Are you sure that you want to exit the installer?", vbYesNo + vbQuestion, Text) = MsgBoxResult.No Then
+        If (CurrentWizardPage.InstallerWizardPage <> WizardPage.Page.FinishPage And CurrentWizardPage.InstallerWizardPage <> WizardPage.Page.FailurePage) AndAlso MsgBox("Are you sure that you want to exit the installer?", vbYesNo + vbQuestion, Text) = MsgBoxResult.No Then
             e.Cancel = True
             Beep()
             Exit Sub
@@ -332,12 +339,18 @@ Public Class MainForm
         End Try
     End Sub
 
-    Public Function RunBCDConfigurator(Arguments As String) As Integer
-        BCDEditProcess.StartInfo.Arguments = Arguments
-        BCDEditProcess.Start()
-        BCDEditProcess.WaitForExit()
-        Return BCDEditProcess.ExitCode
-    End Function
+    Public Sub RunBCDConfigurator(Arguments As String, Optional DontWorryBeHappy As Boolean = False)
+        Try
+            BCDEditProcess.StartInfo.Arguments = Arguments
+            BCDEditProcess.Start()
+            BCDEditProcess.WaitForExit()
+            If Not DontWorryBeHappy And BCDEditProcess.ExitCode <> 0 Then
+                Throw New Exception("The BCDEdit process, with command-line arguments " & Quote & Arguments & Quote & ", has failed with exit code " & Hex(BCDEditProcess.ExitCode) & " (" & New Win32Exception(BCDEditProcess.ExitCode).Message & "). Check this command with these arguments manually.")
+            End If
+        Catch ex As Exception
+            Throw ex
+        End Try
+    End Sub
 
     Sub RunBCDConfiguration()
         Try
@@ -350,16 +363,14 @@ Public Class MainForm
             InstallerBW.ReportProgress(20)
             RunBCDConfigurator("/set {default} bootmenupolicy legacy")
             RunBCDConfigurator("/set {current} bootmenupolicy legacy")
-            RunBCDConfigurator("/set {bootmgr} bootmenupolicy legacy")
             RunBCDConfigurator("/set {bootmgr} timeout 3")
 
             ' Configure RAMDisk Settings
             ProgressMessage = "Updating RAMDisk configuration..."
             InstallerBW.ReportProgress(25)
-            RunBCDConfigurator("/create {ramdiskoptions}")
+            RunBCDConfigurator("/create {ramdiskoptions}", True)
             RunBCDConfigurator("/set {ramdiskoptions} ramdisksdidevice partition=" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim())
             RunBCDConfigurator("/set {ramdiskoptions} ramdisksdipath \$DISMTOOLS.~BT\Boot\Boot.sdi")
-            RunBCDConfigurator("/deletevalue {ramdiskoptions} description")     ' Necessary to delete if description is already in ramdisksettings
 
             ' Create BCD Entry and grab GUID
             ProgressMessage = "Creating boot entry..."
@@ -410,15 +421,18 @@ Public Class MainForm
 #End Region
 
     Private Sub InstallerBW_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles InstallerBW.DoWork
+        CurrentStage = InstallationStage.InstallerStage.FileCopy
         ProgressMessage = "Creating temporary directory and copying files..."
         InstallerBW.ReportProgress(5)
         CopyFiles(If(TestMode Or TestBCD, Application.StartupPath, Path.GetPathRoot(Application.StartupPath)), Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT"), "install.wim")
         If Not TestMode OrElse (TestMode AndAlso TestBCD) Then
+            CurrentStage = InstallationStage.InstallerStage.BootEntryCreation
             ' Leave bcdedit stuff out of test mode
             ProgressMessage = "Updating boot configuration..."
             InstallerBW.ReportProgress(20)
             RunBCDConfiguration()
         End If
+        CurrentStage = InstallationStage.InstallerStage.WIMMount
         ProgressMessage = "Mounting Preinstallation Environment image..."
         InstallerBW.ReportProgress(40)
         UseWindowsImage(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT", "sources", "boot.wim"),
@@ -427,6 +441,8 @@ Public Class MainForm
         ProgressMessage = "Performing customizations..."
         InstallerBW.ReportProgress(60)
         Try
+            If TestMode And Not TestBCD Then Exit Try
+            CurrentStage = InstallationStage.InstallerStage.WIMCustomize
             Dim HotInstallInfoPath As String = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~WS", "HotInstall")
             If Not Directory.Exists(HotInstallInfoPath) Then
                 Directory.CreateDirectory(HotInstallInfoPath)
@@ -435,6 +451,7 @@ Public Class MainForm
         Catch ex As Exception
             Throw ex
         End Try
+        CurrentStage = InstallationStage.InstallerStage.WIMUnmount
         ProgressMessage = "Unmounting Preinstallation Environment image..."
         InstallerBW.ReportProgress(80)
         ' Unmount Windows image committing changes
@@ -467,15 +484,21 @@ Public Class MainForm
                 Timer1.Enabled = True
                 ChangePage(CurrentWizardPage.InstallerWizardPage + 1)
                 Exit Sub
+            Else
+                LogErrorMessage(e.Error, CurrentStage)
+                ChangePage(WizardPage.Page.FailurePage)
             End If
-            MsgBox(e.Error.ToString(), vbOKOnly + vbCritical, Text)
         End If
     End Sub
 
     Private Sub RestartButton_Click(sender As Object, e As EventArgs) Handles RestartButton.Click
         If Not TestMode Then
-            Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "system32", "shutdown.exe"),
-                          "/r /t 0")
+            Dim Shutter As New Process
+            Shutter.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "system32", "shutdown.exe")
+            Shutter.StartInfo.Arguments = "/r /t 0"
+            Shutter.StartInfo.CreateNoWindow = True
+            Shutter.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+            Shutter.Start()
         End If
         Close()
     End Sub
@@ -488,5 +511,33 @@ Public Class MainForm
             Timer1.Enabled = False
             RestartButton.PerformClick()
         End If
+    End Sub
+
+    Sub LogErrorMessage(ex As Exception, stage As InstallationStage.InstallerStage)
+        If ex Is Nothing Then Exit Sub
+
+        Dim stageStr As String = ""
+        ErrorTextBox.Clear()
+        Select Case stage
+            Case InstallationStage.InstallerStage.FileCopy
+                stageStr = "file copy"
+            Case InstallationStage.InstallerStage.BootEntryCreation
+                stageStr = "the creation of boot entries"
+            Case InstallationStage.InstallerStage.WIMMount
+                stageStr = "the mount process of the Preinstallation Environment image"
+            Case InstallationStage.InstallerStage.WIMCustomize
+                stageStr = "the customization of the Preinstallation Environment image"
+            Case InstallationStage.InstallerStage.WIMUnmount
+                stageStr = "the unmount process of the Preinstallation Environment image"
+            Case InstallationStage.InstallerStage.Miscellaneous
+                stageStr = "a different procedure"
+        End Select
+
+        ErrorTextBox.AppendText("Computer preparation has failed during " & stageStr & " due to the following error:" & CrLf & CrLf)
+
+        ErrorTextBox.AppendText(ex.Message & CrLf)
+        ErrorTextBox.AppendText("Error code: " & Hex(ex.HResult) & " (" & New System.ComponentModel.Win32Exception(ex.HResult).Message & ")" & CrLf & CrLf)
+
+        ErrorTextBox.AppendText("Please report this issue here: https://github.com/CodingWonders/DT-HotInstall/issues/new")
     End Sub
 End Class

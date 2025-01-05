@@ -117,6 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Label38.Text" xml:space="preserve">
+    <value>To fix this problem, try restarting your computer and doing this process again. If this error occurs one more time, consider checking the health of your operating system and/or whether or not other software is conflicting with this operation.
+
+We would also like to know about this problem. To do this, report an issue on the GitHub repository.</value>
+  </data>
   <data name="Label32.Text" xml:space="preserve">
     <value>This preliminary stage of OS installation has completed successfully and your computer needs to restart.
 
