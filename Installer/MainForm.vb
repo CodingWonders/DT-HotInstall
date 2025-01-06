@@ -31,6 +31,11 @@ Public Class MainForm
     Dim TimeTaken As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Check if the account has the required privileges
+        If Not My.User.IsInRole(ApplicationServices.BuiltInRole.Administrator) Then
+            Throw New Exception("This application must be run as an administrator.")
+        End If
+
         VerifyInPages.AddRange(New WizardPage.Page() {WizardPage.Page.DisclaimerPage, WizardPage.Page.ImageInfoPage})
 
         Dim bootPath As String = Path.Combine(Path.GetPathRoot(Application.StartupPath), "sources", "boot.wim")
@@ -85,6 +90,12 @@ Public Class MainForm
 
     End Sub
 
+    ''' <summary>
+    ''' Gives a string representation of a CPU architecture
+    ''' </summary>
+    ''' <param name="Architecture">The number of the CPU architecture</param>
+    ''' <returns>A string representation of <see>Architecture</see></returns>
+    ''' <remarks></remarks>
     Public Function CastCPUArchitecture(Architecture As Integer) As String
         Select Case Architecture
             Case 0
@@ -108,6 +119,13 @@ Public Class MainForm
         End Select
     End Function
 
+    ''' <summary>
+    ''' Gets a compatibility status between 2 architectures, a reference architecture and the computer architecture
+    ''' </summary>
+    ''' <param name="ReferenceArchitecture">The architecture to compare</param>
+    ''' <param name="ComputerArchitecture">The architecture of the computer's processor, obtained via WMI</param>
+    ''' <returns>A boolean determining the compatibility status</returns>
+    ''' <remarks></remarks>
     Public Function GetArchitectureCompatibility(ReferenceArchitecture As Integer, ComputerArchitecture As Integer) As Boolean
         Select Case ComputerArchitecture
             Case 0
@@ -150,6 +168,12 @@ Public Class MainForm
         ChangePage(CurrentWizardPage.InstallerWizardPage - 1)
     End Sub
 
+    ''' <summary>
+    ''' Verifies options in a page before switching to a different one
+    ''' </summary>
+    ''' <param name="WizardPage">The current page the user is in</param>
+    ''' <returns>A validation result</returns>
+    ''' <remarks></remarks>
     Function VerifyOptionsInPage(WizardPage As WizardPage.Page) As Boolean
         Select Case WizardPage
             Case Installer.WizardPage.Page.DisclaimerPage
@@ -165,6 +189,12 @@ Public Class MainForm
         Return True
     End Function
 
+    ''' <summary>
+    ''' Changes the current page the user is in to another one
+    ''' </summary>
+    ''' <param name="NewPage">The new page to change to</param>
+    ''' <param name="Force">(Optional) Determines whether or not to skip checks</param>
+    ''' <remarks></remarks>
     Sub ChangePage(NewPage As WizardPage.Page, Optional Force As Boolean = False)
         If NewPage > CurrentWizardPage.InstallerWizardPage AndAlso VerifyInPages.Contains(CurrentWizardPage.InstallerWizardPage) AndAlso Not Force Then
             If Not VerifyOptionsInPage(CurrentWizardPage.InstallerWizardPage) Then Exit Sub
@@ -201,6 +231,12 @@ Public Class MainForm
         End If
     End Sub
 
+    ''' <summary>
+    ''' Gets information about a specified image file
+    ''' </summary>
+    ''' <param name="WindowsImage">The absolute path of the Windows image file (in WIM format)</param>
+    ''' <returns>An image information collection</returns>
+    ''' <remarks></remarks>
     Public Function GetImageInformation(WindowsImage As String) As DismImageInfoCollection
         Try
             DismApi.Initialize(DismLogLevel.LogErrors)
@@ -254,7 +290,14 @@ Public Class MainForm
 
 #Region "System Preparation Work"
 
-    Sub CopyFiles(Source As String, Destination As String, Optional excludedFile As String = "")
+    ''' <summary>
+    ''' Copies files from a given source to a given destination, whilst excluding any items whose names match the given exclusion
+    ''' </summary>
+    ''' <param name="Source">The source folder to copy files from</param>
+    ''' <param name="Destination">The destination folder to copy files to</param>
+    ''' <param name="ExcludedFile">The file to exclude from the copy process</param>
+    ''' <remarks></remarks>
+    Sub CopyFiles(Source As String, Destination As String, Optional ExcludedFile As String = "")
         Try
             If Not Directory.Exists(Destination) Then
                 Directory.CreateDirectory(Destination)
@@ -276,7 +319,7 @@ Public Class MainForm
             For Each FileToCopy In Directory.GetFiles(Source, "*", SearchOption.AllDirectories)
                 ProgressMessage = "Copying files from disc image... (Items copied thus far: " & CopiedFiles & "/" & FileCount & ")"
                 InstallerBW.ReportProgress(5)
-                If Path.GetFileName(FileToCopy) = excludedFile Then
+                If Path.GetFileName(FileToCopy) = ExcludedFile Then
                     CopiedFiles += 1
                     Continue For
                 End If
@@ -291,6 +334,15 @@ Public Class MainForm
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Performs basic image file management with the provided Windows image
+    ''' </summary>
+    ''' <param name="ImageFile">The source image file to manage</param>
+    ''' <param name="MountDirectory">A location where the image is mounted or will be mounted to</param>
+    ''' <param name="Index">(Optional) The source index to mount</param>
+    ''' <param name="Mount">(Optional) Determines whether or not to mount an image</param>
+    ''' <param name="Commit">(Optional) Determines whether or not to save changes</param>
+    ''' <remarks>If Mount is true, an index must be specified.</remarks>
     Sub UseWindowsImage(ImageFile As String, MountDirectory As String, Optional Index As Integer = 0, Optional Mount As Boolean = False, Optional Commit As Boolean = False)
         ' Check if things exist
         If Not File.Exists(ImageFile) Then Throw New Exception("The Windows image " & Quote & ImageFile & Quote & " does not exist in the file system.")
@@ -339,6 +391,12 @@ Public Class MainForm
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Runs BCDEdit with the provided arguments
+    ''' </summary>
+    ''' <param name="Arguments">The command-line arguments to pass to the command</param>
+    ''' <param name="DontWorryBeHappy">(Optional) Determines whether or not to throw an exception if the process exits with a code different from 0</param>
+    ''' <remarks>Arguments need to be passed. Otherwise, BCDEdit will simply return a basic list of entries on the BCD</remarks>
     Public Sub RunBCDConfigurator(Arguments As String, Optional DontWorryBeHappy As Boolean = False)
         Try
             BCDEditProcess.StartInfo.Arguments = Arguments
@@ -352,6 +410,10 @@ Public Class MainForm
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Performs modifications to the Boot Configuration Data (BCD) of the system
+    ''' </summary>
+    ''' <remarks></remarks>
     Sub RunBCDConfiguration()
         Try
             BCDEditProcess.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "system32", "bcdedit.exe")
@@ -513,6 +575,12 @@ Public Class MainForm
         End If
     End Sub
 
+    ''' <summary>
+    ''' Logs an error message caused by an exception
+    ''' </summary>
+    ''' <param name="ex">The exception that was caught</param>
+    ''' <param name="stage">The stage at which the installer was</param>
+    ''' <remarks></remarks>
     Sub LogErrorMessage(ex As Exception, stage As InstallationStage.InstallerStage)
         If ex Is Nothing Then Exit Sub
 

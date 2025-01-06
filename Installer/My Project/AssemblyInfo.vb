@@ -8,11 +8,11 @@ Imports System.Runtime.InteropServices
 
 ' Revisar los valores de los atributos del ensamblado
 
-<Assembly: AssemblyTitle("Installer")>
+<Assembly: AssemblyTitle("HotInstall Operating System Installer")> 
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("Installer")>
-<Assembly: AssemblyCopyright("Copyright ©  2024")>
+<Assembly: AssemblyProduct("HotInstall")> 
+<Assembly: AssemblyCopyright("© 2025 CodingWonders Software")> 
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' mediante el carácter '*', como se muestra a continuación:
 ' <Assembly: AssemblyVersion("1.0.*")>
 
-<Assembly: AssemblyVersion("1.0.0.0")>
-<Assembly: AssemblyFileVersion("1.0.0.0")>
+<Assembly: AssemblyVersion("0.6.1.0")> 
+<Assembly: AssemblyFileVersion("0.6.1.0")> 

@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Revisar los valores de los atributos del ensamblado
 
-<Assembly: AssemblyTitle("HotInstall Operating System Installer")> 
+<Assembly: AssemblyTitle("HotInstall Operating System Installation Bootstrapper")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("")> 
+<Assembly: AssemblyProduct("HotInstall Bootstrapper")> 
 <Assembly: AssemblyCopyright("© 2025 CodingWonders Software")> 
 <Assembly: AssemblyTrademark("")> 
 
