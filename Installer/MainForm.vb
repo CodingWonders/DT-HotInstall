@@ -369,12 +369,14 @@ Public Class MainForm
                     Throw New Exception("When mounting an image, the index must be greater than 0")
                 End If
                 DismApi.MountImage(ImageFile, MountDirectory, Index, False, Sub(progress As DismProgress)
+                                                                                If progress.Current > 100 Then Exit Sub
                                                                                 DismProgressPercentage = progress.Current
                                                                                 ProgressMessage = MountString & " (" & DismProgressPercentage & "%)"
                                                                                 InstallerBW.ReportProgress(ProgressBar1.Value)
                                                                             End Sub)
             Else
                 DismApi.UnmountImage(MountDirectory, Commit, Sub(progress As DismProgress)
+                                                                 If (progress.Current / 2) > 100 Then Exit Sub
                                                                  DismProgressPercentage = progress.Current / 2
                                                                  ProgressMessage = UnmountString & " (" & DismProgressPercentage & "%)"
                                                                  InstallerBW.ReportProgress(ProgressBar1.Value)
