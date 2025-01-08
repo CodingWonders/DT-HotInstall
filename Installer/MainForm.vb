@@ -443,7 +443,7 @@ Public Class MainForm
             BCDEditProcess.Start()
             TargetGuidOutput = BCDEditProcess.StandardOutput.ReadToEnd()
             BCDEditProcess.WaitForExit()
-            If BCDEditProcess.ExitCode <> 0 Then Throw New Win32Exception(BCDEditProcess.ExitCode, "Boot entry creation has failed with the following error:")
+            If BCDEditProcess.ExitCode <> 0 Then Throw New Exception("Boot entry creation has failed with exit code " & Hex(BCDEditProcess.ExitCode) & " (" & New Win32Exception(BCDEditProcess.ExitCode).Message & ")")
 
             ' Extract GUID
             Dim startIndex As Integer = TargetGuidOutput.IndexOf("{")
