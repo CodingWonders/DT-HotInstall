@@ -19,7 +19,7 @@ Public Class MainForm
     Dim BCDEntryTextLocation As String
 
     Dim BootMgrEntryName As String = "DISMTools Operating System Installation"
-    Dim SlideshowPicture As Integer = 0
+    Dim SlideshowPicture As Integer = 1
 
     Dim ProgressMessage As String = ""
 
@@ -31,6 +31,10 @@ Public Class MainForm
     Dim TimeTaken As Integer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Because of the DISM API, Windows 7 compatibility is out the window (no pun intended)
+        If Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor < 2 Then
+            Throw New Exception("This program is incompatible with Windows 7 and Server 2008 R2 due to lack of support for the DISM API.")
+        End If
         ' Check if the account has the required privileges
         If Not My.User.IsInRole(ApplicationServices.BuiltInRole.Administrator) Then
             Throw New Exception("This application must be run as an administrator.")
