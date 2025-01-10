@@ -5,8 +5,6 @@ Public Class Form1
     Dim BackgroundPicture As Image
     Dim InstallerProcess As New Process()
 
-    Dim IsTestBuild As Boolean = True
-
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Load background image
         If File.Exists(Application.StartupPath & "\Resources\background.jpg") Then
@@ -26,7 +24,7 @@ Public Class Form1
             VersionLabel.Text = VersionLabel.Text.Replace("<version>", My.Application.Info.Version.ToString()).Trim() & "_" & RetrieveLinkerTimestamp(My.Application.Info.DirectoryPath & "\" & My.Application.Info.AssemblyName & ".exe").ToString("yyMMdd-HHmm")
         End If
 
-        VersionLabel.Visible = IsTestBuild
+        VersionLabel.Visible = File.Exists(Path.Combine(Application.StartupPath, "testbuild"))
 
         InstallerBW.RunWorkerAsync()
     End Sub
