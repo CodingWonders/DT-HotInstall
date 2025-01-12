@@ -85,6 +85,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="DSC\DiskSpaceChecker.Designer.vb">
+      <DependentUpon>DiskSpaceChecker.vb</DependentUpon>
+    </Compile>
+    <Compile Include="DSC\DiskSpaceChecker.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="InstallationStage.vb" />
     <Compile Include="MainForm.vb">
       <SubType>Form</SubType>
@@ -108,9 +114,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Util\Utilities.vb" />
     <Compile Include="WizardPage.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="DSC\DiskSpaceChecker.resx">
+      <DependentUpon>DiskSpaceChecker.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -147,6 +157,7 @@
   <ItemGroup>
     <Content Include="logo.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>XCOPY "$(TargetDir)\*" "$(SolutionDir)SplashScreen\bin\Debug\Installer" /cehyi

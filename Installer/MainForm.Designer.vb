@@ -29,6 +29,11 @@ Partial Class MainForm
         Me.NextButton = New System.Windows.Forms.Button()
         Me.ExitButton = New System.Windows.Forms.Button()
         Me.PageContainerPanel = New System.Windows.Forms.Panel()
+        Me.ErrorPanel = New System.Windows.Forms.Panel()
+        Me.ErrorTextBox = New System.Windows.Forms.TextBox()
+        Me.Label38 = New System.Windows.Forms.Label()
+        Me.Label37 = New System.Windows.Forms.Label()
+        Me.Label36 = New System.Windows.Forms.Label()
         Me.FinishPanel = New System.Windows.Forms.Panel()
         Me.ProgressBar2 = New System.Windows.Forms.ProgressBar()
         Me.RestartButton = New System.Windows.Forms.Button()
@@ -99,13 +104,9 @@ Partial Class MainForm
         Me.InstallerBW = New System.ComponentModel.BackgroundWorker()
         Me.BCDEditProcess = New System.Diagnostics.Process()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
-        Me.ErrorPanel = New System.Windows.Forms.Panel()
-        Me.Label36 = New System.Windows.Forms.Label()
-        Me.Label37 = New System.Windows.Forms.Label()
-        Me.ErrorTextBox = New System.Windows.Forms.TextBox()
-        Me.Label38 = New System.Windows.Forms.Label()
         Me.ButtonContainerPanel.SuspendLayout()
         Me.PageContainerPanel.SuspendLayout()
+        Me.ErrorPanel.SuspendLayout()
         Me.FinishPanel.SuspendLayout()
         Me.InstallationPanel.SuspendLayout()
         Me.StepPanelContainer.SuspendLayout()
@@ -124,11 +125,11 @@ Partial Class MainForm
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
-        Me.ErrorPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'ButtonContainerPanel
         '
+        Me.ButtonContainerPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(239, Byte), Integer), CType(CType(239, Byte), Integer), CType(CType(242, Byte), Integer))
         Me.ButtonContainerPanel.Controls.Add(Me.BackButton)
         Me.ButtonContainerPanel.Controls.Add(Me.NextButton)
         Me.ButtonContainerPanel.Controls.Add(Me.ExitButton)
@@ -185,6 +186,64 @@ Partial Class MainForm
         Me.PageContainerPanel.Name = "PageContainerPanel"
         Me.PageContainerPanel.Size = New System.Drawing.Size(784, 525)
         Me.PageContainerPanel.TabIndex = 1
+        '
+        'ErrorPanel
+        '
+        Me.ErrorPanel.Controls.Add(Me.ErrorTextBox)
+        Me.ErrorPanel.Controls.Add(Me.Label38)
+        Me.ErrorPanel.Controls.Add(Me.Label37)
+        Me.ErrorPanel.Controls.Add(Me.Label36)
+        Me.ErrorPanel.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.ErrorPanel.Location = New System.Drawing.Point(0, 0)
+        Me.ErrorPanel.Name = "ErrorPanel"
+        Me.ErrorPanel.Size = New System.Drawing.Size(784, 525)
+        Me.ErrorPanel.TabIndex = 5
+        Me.ErrorPanel.Visible = False
+        '
+        'ErrorTextBox
+        '
+        Me.ErrorTextBox.BackColor = System.Drawing.Color.White
+        Me.ErrorTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.ErrorTextBox.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ErrorTextBox.Location = New System.Drawing.Point(68, 126)
+        Me.ErrorTextBox.Multiline = True
+        Me.ErrorTextBox.Name = "ErrorTextBox"
+        Me.ErrorTextBox.ReadOnly = True
+        Me.ErrorTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.ErrorTextBox.Size = New System.Drawing.Size(649, 302)
+        Me.ErrorTextBox.TabIndex = 9
+        '
+        'Label38
+        '
+        Me.Label38.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label38.Location = New System.Drawing.Point(14, 439)
+        Me.Label38.Name = "Label38"
+        Me.Label38.Size = New System.Drawing.Size(758, 72)
+        Me.Label38.TabIndex = 8
+        Me.Label38.Text = resources.GetString("Label38.Text")
+        '
+        'Label37
+        '
+        Me.Label37.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label37.Location = New System.Drawing.Point(14, 43)
+        Me.Label37.Name = "Label37"
+        Me.Label37.Size = New System.Drawing.Size(758, 72)
+        Me.Label37.TabIndex = 8
+        Me.Label37.Text = "Your computer could not be prepared to boot to the next stage of operating system" & _
+    " installation. Any changes made to your computer will be undone." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "See below fo" & _
+    "r reasons why this process has failed:"
+        '
+        'Label36
+        '
+        Me.Label36.AutoSize = True
+        Me.Label36.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label36.Location = New System.Drawing.Point(13, 13)
+        Me.Label36.Name = "Label36"
+        Me.Label36.Size = New System.Drawing.Size(165, 21)
+        Me.Label36.TabIndex = 7
+        Me.Label36.Text = "We ran into a problem"
         '
         'FinishPanel
         '
@@ -392,7 +451,6 @@ Partial Class MainForm
         '
         Me.Label25.AutoSize = True
         Me.Label25.Font = New System.Drawing.Font("Segoe UI Light", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label25.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Label25.Location = New System.Drawing.Point(64, 254)
         Me.Label25.Name = "Label25"
         Me.Label25.Size = New System.Drawing.Size(53, 65)
@@ -448,7 +506,6 @@ Partial Class MainForm
         '
         Me.Label28.AutoSize = True
         Me.Label28.Font = New System.Drawing.Font("Segoe UI Light", 36.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label28.ForeColor = System.Drawing.SystemColors.ControlText
         Me.Label28.Location = New System.Drawing.Point(123, 254)
         Me.Label28.Name = "Label28"
         Me.Label28.Size = New System.Drawing.Size(53, 65)
@@ -591,6 +648,7 @@ Partial Class MainForm
         '
         'ListView1
         '
+        Me.ListView1.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.ListView1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4, Me.ColumnHeader5})
         Me.ListView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ListView1.FullRowSelect = True
@@ -821,6 +879,7 @@ Partial Class MainForm
         '
         'TextBox1
         '
+        Me.TextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBox1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBox1.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBox1.Location = New System.Drawing.Point(3, 3)
@@ -845,6 +904,7 @@ Partial Class MainForm
         '
         'TextBox2
         '
+        Me.TextBox2.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBox2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBox2.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBox2.Location = New System.Drawing.Point(3, 3)
@@ -868,6 +928,7 @@ Partial Class MainForm
         '
         'TextBox3
         '
+        Me.TextBox3.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBox3.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBox3.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBox3.Location = New System.Drawing.Point(0, 0)
@@ -926,63 +987,6 @@ Partial Class MainForm
         '
         Me.Timer1.Interval = 1000
         '
-        'ErrorPanel
-        '
-        Me.ErrorPanel.Controls.Add(Me.ErrorTextBox)
-        Me.ErrorPanel.Controls.Add(Me.Label38)
-        Me.ErrorPanel.Controls.Add(Me.Label37)
-        Me.ErrorPanel.Controls.Add(Me.Label36)
-        Me.ErrorPanel.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.ErrorPanel.Location = New System.Drawing.Point(0, 0)
-        Me.ErrorPanel.Name = "ErrorPanel"
-        Me.ErrorPanel.Size = New System.Drawing.Size(784, 525)
-        Me.ErrorPanel.TabIndex = 5
-        Me.ErrorPanel.Visible = False
-        '
-        'Label36
-        '
-        Me.Label36.AutoSize = True
-        Me.Label36.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label36.Location = New System.Drawing.Point(13, 13)
-        Me.Label36.Name = "Label36"
-        Me.Label36.Size = New System.Drawing.Size(165, 21)
-        Me.Label36.TabIndex = 7
-        Me.Label36.Text = "We ran into a problem"
-        '
-        'Label37
-        '
-        Me.Label37.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label37.Location = New System.Drawing.Point(14, 43)
-        Me.Label37.Name = "Label37"
-        Me.Label37.Size = New System.Drawing.Size(758, 72)
-        Me.Label37.TabIndex = 8
-        Me.Label37.Text = "Your computer could not be prepared to boot to the next stage of operating system" & _
-    " installation. Any changes made to your computer will be undone." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "See below fo" & _
-    "r reasons why this process has failed:"
-        '
-        'ErrorTextBox
-        '
-        Me.ErrorTextBox.BackColor = System.Drawing.Color.White
-        Me.ErrorTextBox.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ErrorTextBox.Location = New System.Drawing.Point(68, 126)
-        Me.ErrorTextBox.Multiline = True
-        Me.ErrorTextBox.Name = "ErrorTextBox"
-        Me.ErrorTextBox.ReadOnly = True
-        Me.ErrorTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.ErrorTextBox.Size = New System.Drawing.Size(649, 302)
-        Me.ErrorTextBox.TabIndex = 9
-        '
-        'Label38
-        '
-        Me.Label38.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label38.Location = New System.Drawing.Point(14, 439)
-        Me.Label38.Name = "Label38"
-        Me.Label38.Size = New System.Drawing.Size(758, 72)
-        Me.Label38.TabIndex = 8
-        Me.Label38.Text = resources.GetString("Label38.Text")
-        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -1005,6 +1009,8 @@ Partial Class MainForm
         Me.TopMost = True
         Me.ButtonContainerPanel.ResumeLayout(False)
         Me.PageContainerPanel.ResumeLayout(False)
+        Me.ErrorPanel.ResumeLayout(False)
+        Me.ErrorPanel.PerformLayout()
         Me.FinishPanel.ResumeLayout(False)
         Me.FinishPanel.PerformLayout()
         Me.InstallationPanel.ResumeLayout(False)
@@ -1035,8 +1041,6 @@ Partial Class MainForm
         Me.TabPage2.PerformLayout()
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage3.PerformLayout()
-        Me.ErrorPanel.ResumeLayout(False)
-        Me.ErrorPanel.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub

@@ -92,6 +92,40 @@ Public Class MainForm
             (ScreenBounds.Height - Height) / 2
             )
 
+        Dim IsDarkMode As Boolean = Utilities.IsSystemInDarkMode
+
+        If Utilities.IsWindowsVersionOrGreater(10, 0, 18362) Then Utilities.EnableDarkTitleBar(Handle, IsDarkMode)
+
+        BackColor = If(IsDarkMode, Color.FromArgb(31, 31, 31), Color.White)
+        ForeColor = If(IsDarkMode, Color.White, Color.Black)
+        ButtonContainerPanel.BackColor = If(IsDarkMode, Color.FromArgb(48, 48, 48), Color.FromArgb(239, 239, 242))
+        GroupBox1.BackColor = BackColor
+        GroupBox1.ForeColor = ForeColor
+        GroupBox2.BackColor = BackColor
+        GroupBox2.ForeColor = ForeColor
+        ListView1.BackColor = BackColor
+        ListView1.ForeColor = ForeColor
+        TabPage1.BackColor = BackColor
+        TabPage1.ForeColor = ForeColor
+        TabPage2.BackColor = BackColor
+        TabPage2.ForeColor = ForeColor
+        TabPage3.BackColor = BackColor
+        TabPage3.ForeColor = ForeColor
+        TextBox1.BackColor = BackColor
+        TextBox1.ForeColor = ForeColor
+        TextBox2.BackColor = BackColor
+        TextBox2.ForeColor = ForeColor
+        TextBox3.BackColor = BackColor
+        TextBox3.ForeColor = ForeColor
+        ErrorTextBox.BackColor = BackColor
+        ErrorTextBox.ForeColor = ForeColor
+
+        If IsDarkMode Then
+
+        Else
+
+        End If
+
     End Sub
 
     ''' <summary>
