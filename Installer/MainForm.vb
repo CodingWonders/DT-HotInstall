@@ -120,11 +120,7 @@ Public Class MainForm
         ErrorTextBox.BackColor = BackColor
         ErrorTextBox.ForeColor = ForeColor
 
-        If IsDarkMode Then
-
-        Else
-
-        End If
+        PictureBox3.Image = If(IsDarkMode, My.Resources.hotinstall_step3_dm, My.Resources.hotinstall_step3)
 
     End Sub
 

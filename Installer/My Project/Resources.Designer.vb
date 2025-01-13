@@ -91,6 +91,16 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property hotinstall_step3_dm() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("hotinstall_step3_dm", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Busca una cadena traducida similar a - HotInstall
         '''
         '''This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or at your option any later version.
