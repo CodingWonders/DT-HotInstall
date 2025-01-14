@@ -25,6 +25,7 @@ Public Class Utilities
     End Sub
 
     Function GetWindowHandle(ctrl As Control) As IntPtr
+        If ctrl Is Nothing Then Return IntPtr.Zero
         Return ctrl.Handle
     End Function
 
