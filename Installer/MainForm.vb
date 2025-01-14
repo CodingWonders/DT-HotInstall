@@ -280,8 +280,7 @@ Public Class MainForm
                 Throw New Exception("The Windows image " & Quote & WindowsImage & Quote & " does not exist in the file system", New Win32Exception(2))
             End If
         Catch ex As Exception
-            Throw ex
-            Return Nothing
+            Throw
         Finally
             Try
                 DismApi.Shutdown()
@@ -364,7 +363,7 @@ Public Class MainForm
                 File.SetAttributes(destinationPath, FileAttributes.Archive)
             Next
         Catch ex As Exception
-            Throw ex
+            Throw
         End Try
     End Sub
 
@@ -385,7 +384,7 @@ Public Class MainForm
                 Directory.CreateDirectory(MountDirectory)
             End If
         Catch ex As Exception
-            Throw ex
+            Throw
         End Try
 
         DismProgressPercentage = 0
@@ -417,7 +416,7 @@ Public Class MainForm
                                                              End Sub)
             End If
         Catch ex As Exception
-            Throw ex
+            Throw
         Finally
             Try
                 DismApi.Shutdown()
@@ -442,7 +441,7 @@ Public Class MainForm
                 Throw New Exception("The BCDEdit process, with command-line arguments " & Quote & Arguments & Quote & ", has failed with exit code " & Hex(BCDEditProcess.ExitCode) & " (" & New Win32Exception(BCDEditProcess.ExitCode).Message & "). Check this command with these arguments manually.")
             End If
         Catch ex As Exception
-            Throw ex
+            Throw
         End Try
     End Sub
 
@@ -512,7 +511,7 @@ Public Class MainForm
             RunBCDConfigurator("/default " & TargetGuid)
 
         Catch ex As Exception
-            Throw ex
+            Throw
         End Try
     End Sub
 
