@@ -10,8 +10,8 @@ Public Class MainForm
     Dim CurrentWizardPage As New WizardPage()
     Dim VerifyInPages As New List(Of WizardPage.Page)
 
-    Dim TestMode As Boolean = Environment.GetCommandLineArgs().Contains("/test")
-    Dim TestBCD As Boolean = Environment.GetCommandLineArgs().Contains("/bcdtest")
+    Public TestMode As Boolean = Environment.GetCommandLineArgs().Contains("/test")
+    Public TestBCD As Boolean = Environment.GetCommandLineArgs().Contains("/bcdtest")
 
     Dim BootArchitecture As Integer
     Dim ComputerArchitecture As Integer
@@ -519,6 +519,14 @@ Public Class MainForm
 #End Region
 
     Private Sub InstallerBW_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles InstallerBW.DoWork
+        Control.CheckForIllegalCrossThreadCalls = False
+        CurrentStage = InstallationStage.InstallerStage.DiskSpaceChecker
+        If DiskSpaceChecker.ShowDialog(Me) = Windows.Forms.DialogResult.Cancel Then
+            Throw New Exception("Disk Space Checker has either failed or reported a failed disk space check." & CrLf &
+                                "Installation cannot proceed. Try freeing up some disk space and starting the process again." & CrLf & CrLf &
+                                "Please check the DSC report in " & Quote & "\DscReport.txt" & Quote)
+        End If
+        Control.CheckForIllegalCrossThreadCalls = True
         CurrentStage = InstallationStage.InstallerStage.FileCopy
         ProgressMessage = "Creating temporary directory and copying files..."
         InstallerBW.ReportProgress(5)
@@ -546,6 +554,10 @@ Public Class MainForm
                 Directory.CreateDirectory(HotInstallInfoPath)
             End If
             File.WriteAllText(Path.Combine(HotInstallInfoPath, "BcdEntry"), File.ReadAllText(BCDEntryTextLocation))
+            If File.Exists(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "DscReport.txt")) Then
+                File.Move(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "DscReport.txt"),
+                          Path.Combine(HotInstallInfoPath, "DscReport.txt"))
+            End If
         Catch ex As Exception
             Throw ex
         End Try
@@ -623,6 +635,11 @@ Public Class MainForm
         Dim stageStr As String = ""
         ErrorTextBox.Clear()
         Select Case stage
+            Case InstallationStage.InstallerStage.DiskSpaceChecker
+                ' Close DSC and BGProcs
+                DiskSpaceChecker.Dispose()
+                InstallerBW.CancelAsync()
+                stageStr = "disk space checks"
             Case InstallationStage.InstallerStage.FileCopy
                 stageStr = "file copy"
             Case InstallationStage.InstallerStage.BootEntryCreation

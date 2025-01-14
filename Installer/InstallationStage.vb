@@ -6,6 +6,11 @@
     ''' <remarks></remarks>
     Public Enum InstallerStage
         ''' <summary>
+        ''' The installer is checking disk space
+        ''' </summary>
+        ''' <remarks></remarks>
+        DiskSpaceChecker
+        ''' <summary>
         ''' Files are being copied
         ''' </summary>
         ''' <remarks></remarks>
