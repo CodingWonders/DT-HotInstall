@@ -114,6 +114,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Util\Converters.vb" />
     <Compile Include="Util\Utilities.vb" />
     <Compile Include="WizardPage.vb" />
   </ItemGroup>

@@ -54,8 +54,8 @@ Public Class DiskSpaceChecker
                                   "- Drive type: " & FixedDrive.DriveType.ToString() & CrLf &
                                   "- Drive format: " & FixedDrive.DriveFormat & CrLf &
                                   "- Drive label: " & FixedDrive.VolumeLabel & CrLf &
-                                  "- Drive size: " & FixedDrive.TotalSize & " bytes" & CrLf &
-                                  "- Free space: " & FixedDrive.TotalFreeSpace & " bytes" & CrLf &
+                                  "- Drive size: " & FixedDrive.TotalSize & " bytes (~" & Converters.BytesToReadableSize(FixedDrive.TotalSize) & ")" & CrLf &
+                                  "- Free space: " & FixedDrive.TotalFreeSpace & " bytes (~" & Converters.BytesToReadableSize(FixedDrive.TotalFreeSpace) & ")" & CrLf &
                                   "- Is the system drive? " & If(FixedDrive.Name = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "Yes", "No") & CrLf & CrLf
             Next
         End If
@@ -67,8 +67,8 @@ Public Class DiskSpaceChecker
                                   "- Drive type: " & RemovableDrive.DriveType.ToString() & CrLf &
                                   "- Drive format: " & RemovableDrive.DriveFormat & CrLf &
                                   "- Drive label: " & RemovableDrive.VolumeLabel & CrLf &
-                                  "- Drive size: " & RemovableDrive.TotalSize & " bytes" & CrLf &
-                                  "- Free space: " & RemovableDrive.TotalFreeSpace & " bytes" & CrLf & CrLf &
+                                  "- Drive size: " & RemovableDrive.TotalSize & " bytes (~" & Converters.BytesToReadableSize(RemovableDrive.TotalSize) & ")" & CrLf &
+                                  "- Free space: " & RemovableDrive.TotalFreeSpace & " bytes (~" & Converters.BytesToReadableSize(RemovableDrive.TotalFreeSpace) & ")" & CrLf & CrLf &
                                   "- Is the system drive? " & If(RemovableDrive.Name = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "Yes", "No") & CrLf & CrLf
             Next
         End If
@@ -80,11 +80,11 @@ Public Class DiskSpaceChecker
 
     Sub ListFreeSpace(FreeSpace As Long, SpaceToCompare As Long)
         reportContents &= "Disc image files will be copied to the system drive shown above:" & CrLf &
-                          "- The total size of the disc image files is " & SpaceToCompare & " bytes" & CrLf &
-                          "- The free space on this drive is " & FreeSpace & " bytes" & CrLf & CrLf
+                          "- The total size of the disc image files is " & SpaceToCompare & " bytes (~" & Converters.BytesToReadableSize(SpaceToCompare) & ")" & CrLf &
+                          "- The free space on this drive is " & FreeSpace & " bytes (~" & Converters.BytesToReadableSize(FreeSpace) & ")" & CrLf & CrLf
 
-        reportContents &= FreeSpace & " > " & SpaceToCompare & " ? " & If(FreeSpace > SpaceToCompare, "Yes", "No") & CrLf &
-                          FreeSpace & " > " & SpaceToCompare & " * 2 ? " & If(FreeSpace > (SpaceToCompare * 2), "Yes", "No") & CrLf & CrLf
+        reportContents &= Converters.BytesToReadableSize(FreeSpace) & " > " & Converters.BytesToReadableSize(SpaceToCompare) & " ? " & If(FreeSpace > SpaceToCompare, "Yes", "No") & CrLf &
+                          Converters.BytesToReadableSize(FreeSpace) & " > " & Converters.BytesToReadableSize(SpaceToCompare * 2) & " ? " & If(FreeSpace > SpaceToCompare, "Yes", "No") & CrLf & CrLf
 
         If FreeSpace < (SpaceToCompare * 2) Then
             reportContents &= "There may not be enough space to copy the disc image files to this drive." & CrLf & CrLf
@@ -111,7 +111,11 @@ Public Class DiskSpaceChecker
         For Each FixedDrive As DriveInfo In FixedDrives
             reportContents &= "- Drive, with label " & Quote & FixedDrive.VolumeLabel & Quote & " (" & FixedDrive.Name & "):" & CrLf
             For x = 0 To ImageSizes.Count - 1
-                reportContents &= "  - " & ImageNames(x) & ": " & FixedDrive.TotalSize & " bytes > " & ImageSizes(x) & " bytes?" & If(FixedDrive.TotalSize > ImageSizes(x), " Yes", " No") & CrLf
+                If FixedDrive.TotalSize > ImageSizes(x) Then
+                    reportContents &= "  - " & Quote & ImageNames(x) & Quote & " (index " & x + 1 & ") can be installed on this drive because there is enough free space." & CrLf
+                Else
+                    reportContents &= "  - " & Quote & ImageNames(x) & Quote & " (index " & x + 1 & ") cannot be installed on this drive because there is not enough free space." & CrLf
+                End If
             Next
         Next
         reportContents &= CrLf
@@ -151,7 +155,7 @@ Public Class DiskSpaceChecker
                         ' We have grabbed the system boot drive
                         progressMessage = "Getting size of disc image files..."
                         BackgroundWorker1.ReportProgress(10)
-                        Dim FolderSize As Long = GetDirectorySize(sourcePath, "install.wim")
+                        Dim FolderSize As Long = GetDirectorySize(sourcePath, "")
                         ' Get the free space of the system boot drive, since we'll copy the files there
                         Dim FreeSpaceOnSystemDrive As Long = SystemBootDrive.TotalFreeSpace
                         ListFreeSpace(FreeSpaceOnSystemDrive, FolderSize)
