@@ -104,19 +104,6 @@ Public Class DiskSpaceChecker
         Return Nothing
     End Function
 
-    Function GetSystemBootDrive(ManagementQuery As String) As ManagementObject
-        Try
-            Dim SysDriveMOS As ManagementObjectSearcher = New ManagementObjectSearcher(ManagementQuery)
-            Dim SysDrives As ManagementObjectCollection = SysDriveMOS.Get()
-            If SysDrives.Count > 0 Then
-                Return SysDrives(0)
-            End If
-        Catch ex As Exception
-            Throw New Exception("Management objects failed with error: " & ex.Message)
-        End Try
-        Return Nothing
-    End Function
-
     Function GetObjectValue(Item As ManagementObject, PropertyOfInterest As String) As Object
         If Item IsNot Nothing AndAlso PropertyOfInterest <> "" Then
             Return Item(PropertyOfInterest)
