@@ -18,7 +18,7 @@ Public Class MainForm
 
     Dim BCDEntryTextLocation As String
 
-    Dim BootMgrEntryName As String = "DISMTools Operating System Installation"
+    Dim BootMgrEntryName As String
     Dim SlideshowPicture As Integer = 1
 
     Dim ProgressMessage As String = ""
@@ -30,14 +30,64 @@ Public Class MainForm
     ' Restart Timer
     Dim TimeTaken As Integer
 
+    Sub ChangeLanguage(LanguageCode As String)
+        If Not File.Exists(Path.Combine(Application.StartupPath, "Languages", "lang_" & LanguageCode & ".ini")) Then
+            LanguageCode = "en"
+        End If
+        LoadLanguageFile(Path.Combine(Application.StartupPath, "Languages", "lang_" & LanguageCode & ".ini"))
+        BackButton.Text = GetValueFromLanguageData("Common.Common_Back")
+        NextButton.Text = GetValueFromLanguageData("Common.Common_Next")
+        ExitButton.Text = GetValueFromLanguageData("Common.Common_Cancel")
+        BootMgrEntryName = GetValueFromLanguageData("MainForm.BootMgrEntryName")
+        Text = GetValueFromLanguageData("MainForm.WndTitle")
+        Label1.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_Header")
+        Label2.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_Description")
+        TabPage1.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_ContentTabTitle1")
+        TabPage2.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_ContentTabTitle2")
+        TabPage3.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_ContentTabTitle3")
+        TextBox1.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_Warranties")
+        TextBox2.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_UseOfDiscImages")
+        CheckBox1.Text = GetValueFromLanguageData("MainForm.DisclaimerPanel_DisclaimerCheck")
+        Label4.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_Header")
+        Label3.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_Description")
+        GroupBox1.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_BootImageInfoGroup")
+        Label8.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_BootImageName")
+        Label9.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_BootImageVersion")
+        Label10.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_BootImageArchitecture")
+        GroupBox2.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_InstallImageInfoGroup")
+        ListView1.Columns(1).Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_InstallImageName")
+        ListView1.Columns(2).Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_InstallImageDescription")
+        ListView1.Columns(3).Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_InstallImageVersion")
+        ListView1.Columns(4).Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_InstallImageArchitecture")
+        Label7.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_ImageArchitectureMismatchError")
+        Label5.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_ComputerArchitecture")
+        Label14.Text = GetValueFromLanguageData("MainForm.ReviewImageInfo_DIM_Notice")
+        Label16.Text = GetValueFromLanguageData("MainForm.ExplanationPanel_Header")
+        Label15.Text = GetValueFromLanguageData("MainForm.ExplanationPanel_Description")
+        Label18.Text = GetValueFromLanguageData("MainForm.PreparationPanel_Header")
+        Label17.Text = GetValueFromLanguageData("MainForm.PreparationPanel_Description")
+        Label20.Text = GetValueFromLanguageData("MainForm.PreparationPanel_Step1").Replace("<entry>", BootMgrEntryName)
+        Label27.Text = GetValueFromLanguageData("MainForm.PreparationPanel_Step2")
+        Label31.Text = GetValueFromLanguageData("MainForm.PreparationPanel_Step3")
+        Label33.Text = GetValueFromLanguageData("MainForm.FinishPanel_Header")
+        Label32.Text = GetValueFromLanguageData("MainForm.FinishPanel_Description")
+        Label35.Text = GetValueFromLanguageData("MainForm.FinishPanel_RestartTimer_Beginning")
+        RestartButton.Text = GetValueFromLanguageData("MainForm.FinishPanel_RestartNow")
+        Label36.Text = GetValueFromLanguageData("MainForm.ErrorPanel_Header")
+        Label37.Text = GetValueFromLanguageData("MainForm.ErrorPanel_Description")
+        Label38.Text = GetValueFromLanguageData("MainForm.ErrorPanel_PossibleFixes")
+    End Sub
+
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ChangeLanguage(My.Computer.Info.InstalledUICulture.TwoLetterISOLanguageName)
+
         ' Because of the DISM API, Windows 7 compatibility is out the window (no pun intended)
         If Environment.OSVersion.Version.Major = 6 And Environment.OSVersion.Version.Minor < 2 Then
-            Throw New Exception("This program is incompatible with Windows 7 and Server 2008 R2 due to lack of support for the DISM API.")
+            Throw New Exception(GetValueFromLanguageData("MainForm.Win7IncompatibilityError"))
         End If
         ' Check if the account has the required privileges
         If Not My.User.IsInRole(ApplicationServices.BuiltInRole.Administrator) Then
-            Throw New Exception("This application must be run as an administrator.")
+            Throw New Exception(GetValueFromLanguageData("MainForm.NonAdminError"))
         End If
 
         VerifyInPages.AddRange(New WizardPage.Page() {WizardPage.Page.DisclaimerPage, WizardPage.Page.ImageInfoPage})
@@ -212,11 +262,11 @@ Public Class MainForm
         Select Case WizardPage
             Case Installer.WizardPage.Page.DisclaimerPage
                 If Not CheckBox1.Checked Then
-                    MsgBox("You must agree to the important notices before proceeding", vbOKOnly + vbCritical, Text)
+                    MsgBox(GetValueFromLanguageData("MainForm.VERIFY_Disclaimer_Error"), vbOKOnly + vbCritical, Text)
                     Return False
                 End If
             Case Installer.WizardPage.Page.ImageInfoPage
-                If MsgBox("Does this disc image have the image you want to test?", vbYesNo + vbQuestion, Text) = MsgBoxResult.No Then
+                If MsgBox(GetValueFromLanguageData("MainForm.VERIFY_ImageInfo_Question"), vbYesNo + vbQuestion, Text) = MsgBoxResult.No Then
                     Return False
                 End If
         End Select
@@ -277,7 +327,7 @@ Public Class MainForm
             If File.Exists(WindowsImage) Then
                 Return DismApi.GetImageInfo(WindowsImage)
             Else
-                Throw New Exception("The Windows image " & Quote & WindowsImage & Quote & " does not exist in the file system", New Win32Exception(2))
+                Throw New Exception(String.Format(GetValueFromLanguageData("MainForm.GetImageInfo_FileDoesNotExistError"), WindowsImage), New Win32Exception(2))
             End If
         Catch ex As Exception
             Throw
@@ -297,7 +347,7 @@ Public Class MainForm
             Beep()
             Exit Sub
         End If
-        If (CurrentWizardPage.InstallerWizardPage <> WizardPage.Page.FinishPage And CurrentWizardPage.InstallerWizardPage <> WizardPage.Page.FailurePage) AndAlso MsgBox("Are you sure that you want to exit the installer?", vbYesNo + vbQuestion, Text) = MsgBoxResult.No Then
+        If (CurrentWizardPage.InstallerWizardPage <> WizardPage.Page.FinishPage And CurrentWizardPage.InstallerWizardPage <> WizardPage.Page.FailurePage) AndAlso MsgBox(GetValueFromLanguageData("MainForm.ClosureQuestion"), vbYesNo + vbQuestion, Text) = MsgBoxResult.No Then
             e.Cancel = True
             Beep()
             Exit Sub
@@ -350,7 +400,7 @@ Public Class MainForm
             Next
 
             For Each FileToCopy In Directory.GetFiles(Source, "*", SearchOption.AllDirectories)
-                ProgressMessage = "Copying files from disc image... (Items copied thus far: " & CopiedFiles & "/" & FileCount & ")"
+                ProgressMessage = String.Format(GetValueFromLanguageData("MainForm.CopyFiles_ProgressMessage"), CopiedFiles, FileCount)
                 InstallerBW.ReportProgress(5)
                 If Path.GetFileName(FileToCopy) = ExcludedFile Then
                     CopiedFiles += 1
@@ -378,7 +428,7 @@ Public Class MainForm
     ''' <remarks>If Mount is true, an index must be specified.</remarks>
     Sub UseWindowsImage(ImageFile As String, MountDirectory As String, Optional Index As Integer = 0, Optional Mount As Boolean = False, Optional Commit As Boolean = False)
         ' Check if things exist
-        If Not File.Exists(ImageFile) Then Throw New Exception("The Windows image " & Quote & ImageFile & Quote & " does not exist in the file system.")
+        If Not File.Exists(ImageFile) Then Throw New Exception(String.Format(GetValueFromLanguageData("MainForm.GetImageInfo_FileDoesNotExistError"), ImageFile))
         Try
             If Not Directory.Exists(MountDirectory) Then
                 Directory.CreateDirectory(MountDirectory)
@@ -399,7 +449,7 @@ Public Class MainForm
             DismApi.Initialize(DismLogLevel.LogErrors)
             If Mount Then
                 If Index <= 0 Then
-                    Throw New Exception("When mounting an image, the index must be greater than 0")
+                    Throw New Exception(GetValueFromLanguageData("MainForm.UseWindowsImage_Mount_IndexLT1"))
                 End If
                 DismApi.MountImage(ImageFile, MountDirectory, Index, False, Sub(progress As DismProgress)
                                                                                 If progress.Current > 100 Then Exit Sub
@@ -438,7 +488,7 @@ Public Class MainForm
             BCDEditProcess.Start()
             BCDEditProcess.WaitForExit()
             If Not DontWorryBeHappy And BCDEditProcess.ExitCode <> 0 Then
-                Throw New Exception("The BCDEdit process, with command-line arguments " & Quote & Arguments & Quote & ", has failed with exit code " & Hex(BCDEditProcess.ExitCode) & " (" & New Win32Exception(BCDEditProcess.ExitCode).Message & "). Check this command with these arguments manually.")
+                Throw New Exception(String.Format(GetValueFromLanguageData("MainForm.BCDEditConfiguratorError"), Arguments, Hex(BCDEditProcess.ExitCode), New Win32Exception(BCDEditProcess.ExitCode).Message))
             End If
         Catch ex As Exception
             Throw
@@ -456,27 +506,27 @@ Public Class MainForm
             Dim TargetGuid As String = ""
 
             ' Configure bootmgr to use legacy view
-            ProgressMessage = "Preparing to update boot configuration..."
+            ProgressMessage = GetValueFromLanguageData("MainForm.BCDEditProcess_Preparation")
             InstallerBW.ReportProgress(20)
             RunBCDConfigurator("/set {default} bootmenupolicy legacy")
             RunBCDConfigurator("/set {current} bootmenupolicy legacy")
             RunBCDConfigurator("/set {bootmgr} timeout 3")
 
             ' Configure RAMDisk Settings
-            ProgressMessage = "Updating RAMDisk configuration..."
+            ProgressMessage = GetValueFromLanguageData("MainForm.BCDEditProcess_RAMDiskConfig")
             InstallerBW.ReportProgress(25)
             RunBCDConfigurator("/create {ramdiskoptions}", True)
             RunBCDConfigurator("/set {ramdiskoptions} ramdisksdidevice partition=" & Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)).Replace("\", "").Trim())
             RunBCDConfigurator("/set {ramdiskoptions} ramdisksdipath \$DISMTOOLS.~BT\Boot\Boot.sdi")
 
             ' Create BCD Entry and grab GUID
-            ProgressMessage = "Creating boot entry..."
+            ProgressMessage = GetValueFromLanguageData("MainForm.BCDEditProcess_BootEntryCreate")
             InstallerBW.ReportProgress(30)
             BCDEditProcess.StartInfo.Arguments = "/create /d " & Quote & BootMgrEntryName & Quote & " /application osloader"
             BCDEditProcess.Start()
             TargetGuidOutput = BCDEditProcess.StandardOutput.ReadToEnd()
             BCDEditProcess.WaitForExit()
-            If BCDEditProcess.ExitCode <> 0 Then Throw New Exception("Boot entry creation has failed with exit code " & Hex(BCDEditProcess.ExitCode) & " (" & New Win32Exception(BCDEditProcess.ExitCode).Message & ")")
+            If BCDEditProcess.ExitCode <> 0 Then Throw New Exception(String.Format(GetValueFromLanguageData("MainForm.BCDEditConfiguratorError_Simple"), Hex(BCDEditProcess.ExitCode), New Win32Exception(BCDEditProcess.ExitCode).Message))
 
             ' Extract GUID
             Dim startIndex As Integer = TargetGuidOutput.IndexOf("{")
@@ -490,7 +540,7 @@ Public Class MainForm
             File.WriteAllText(BCDEntryTextLocation, TargetGuid)
 
             ' Update BCD Entry
-            ProgressMessage = "Configuring boot entry..."
+            ProgressMessage = GetValueFromLanguageData("MainForm.BCDEditProcess_BootEntryConfig")
             InstallerBW.ReportProgress(35)
             Dim osloaderPath As String = ""
             If Environment.GetEnvironmentVariable("FIRMWARE_TYPE") = "UEFI" Then
@@ -505,7 +555,7 @@ Public Class MainForm
             RunBCDConfigurator("/set " & TargetGuid & " systemroot \Windows")
             RunBCDConfigurator("/set " & TargetGuid & " detecthal Yes")
             RunBCDConfigurator("/set " & TargetGuid & " winpe Yes")
-            ProgressMessage = "Modifying display order..."
+            ProgressMessage = GetValueFromLanguageData("MainForm.BCDEditProcess_BootEntryDispOrderModify")
             InstallerBW.ReportProgress(38)
             RunBCDConfigurator("/displayorder " & TargetGuid & " /addfirst")
             RunBCDConfigurator("/default " & TargetGuid)
@@ -521,29 +571,27 @@ Public Class MainForm
         Control.CheckForIllegalCrossThreadCalls = False
         CurrentStage = InstallationStage.InstallerStage.DiskSpaceChecker
         If DiskSpaceChecker.ShowDialog(Me) = Windows.Forms.DialogResult.Cancel Then
-            Throw New Exception("Disk Space Checker has either failed or reported a failed disk space check." & CrLf &
-                                "Installation cannot proceed. Try freeing up some disk space and starting the process again." & CrLf & CrLf &
-                                "Please check the DSC report in " & Quote & "\DscReport.txt" & Quote)
+            Throw New Exception(GetValueFromLanguageData("MainForm.DSC_ReportGen_Error"))
         End If
         Control.CheckForIllegalCrossThreadCalls = True
         CurrentStage = InstallationStage.InstallerStage.FileCopy
-        ProgressMessage = "Creating temporary directory and copying files..."
+        ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_FileCopy")
         InstallerBW.ReportProgress(5)
         CopyFiles(If(TestMode Or TestBCD, Application.StartupPath, Path.GetPathRoot(Application.StartupPath)), Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT"), "install.wim")
         If Not TestMode OrElse (TestMode AndAlso TestBCD) Then
             CurrentStage = InstallationStage.InstallerStage.BootEntryCreation
             ' Leave bcdedit stuff out of test mode
-            ProgressMessage = "Updating boot configuration..."
+            ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_BootEntryCreation")
             InstallerBW.ReportProgress(20)
             RunBCDConfiguration()
         End If
         CurrentStage = InstallationStage.InstallerStage.WIMMount
-        ProgressMessage = "Mounting Preinstallation Environment image..."
+        ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_WIMMount")
         InstallerBW.ReportProgress(40)
         UseWindowsImage(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT", "sources", "boot.wim"),
                         Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~WS"),
                         1, True)
-        ProgressMessage = "Performing customizations..."
+        ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_WIMCustomize")
         InstallerBW.ReportProgress(60)
         Try
             If TestMode And Not TestBCD Then Exit Try
@@ -561,13 +609,13 @@ Public Class MainForm
             Throw ex
         End Try
         CurrentStage = InstallationStage.InstallerStage.WIMUnmount
-        ProgressMessage = "Unmounting Preinstallation Environment image..."
+        ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_WIMUnmount")
         InstallerBW.ReportProgress(80)
         ' Unmount Windows image committing changes
         UseWindowsImage(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT", "sources", "boot.wim"),
                         Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~WS"),
                         0, False, True)
-        ProgressMessage = "Deleting temporary files..."
+        ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_DeleteFiles")
         InstallerBW.ReportProgress(95)
         Try
             If TestMode Then Directory.Delete(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT"), True)
@@ -615,7 +663,13 @@ Public Class MainForm
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         TimeTaken += 1
         ProgressBar2.Value = TimeTaken * 10
-        Label35.Text = "Your computer will restart in " & (10 - TimeTaken) & " second" & If((10 - TimeTaken) = 1, "", "s") & "..."
+        Dim messageIdentifier As String = ""
+        If (10 - TimeTaken) = 1 Then
+            messageIdentifier = "MainForm.AutoRestartMessage_Single"
+        Else
+            messageIdentifier = "MainForm.AutoRestartMessage_Multiple"
+        End If
+        Label35.Text = String.Format(GetValueFromLanguageData(messageIdentifier), 10 - TimeTaken)
         If TimeTaken >= 10 Then
             Timer1.Enabled = False
             RestartButton.PerformClick()
@@ -638,26 +692,26 @@ Public Class MainForm
                 ' Close DSC and BGProcs
                 DiskSpaceChecker.Dispose()
                 InstallerBW.CancelAsync()
-                stageStr = "disk space checks"
+                stageStr = GetValueFromLanguageData("MainForm.ExceptionLogger_DSCStage")
             Case InstallationStage.InstallerStage.FileCopy
-                stageStr = "file copy"
+                stageStr = GetValueFromLanguageData("MainForm.ExceptionLogger_FileCopyStage")
             Case InstallationStage.InstallerStage.BootEntryCreation
-                stageStr = "the creation of boot entries"
+                stageStr = GetValueFromLanguageData("MainForm.ExceptionLogger_BootEntryCreationStage")
             Case InstallationStage.InstallerStage.WIMMount
-                stageStr = "the mount process of the Preinstallation Environment image"
+                stageStr = GetValueFromLanguageData("MainForm.ExceptionLogger_WIMMountStage")
             Case InstallationStage.InstallerStage.WIMCustomize
-                stageStr = "the customization of the Preinstallation Environment image"
+                stageStr = GetValueFromLanguageData("MainForm.ExceptionLogger_WIMCustomizeStage")
             Case InstallationStage.InstallerStage.WIMUnmount
-                stageStr = "the unmount process of the Preinstallation Environment image"
+                stageStr = GetValueFromLanguageData("MainForm.ExceptionLogger_WIMUnmountStage")
             Case InstallationStage.InstallerStage.Miscellaneous
-                stageStr = "a different procedure"
+                stageStr = GetValueFromLanguageData("MainForm.ExceptionLogger_Miscellaneous")
         End Select
 
-        ErrorTextBox.AppendText("Computer preparation has failed during " & stageStr & " due to the following error:" & CrLf & CrLf)
+        ErrorTextBox.AppendText(String.Format(GetValueFromLanguageData("MainForm.ExceptionLogger_ReportHeader"), stageStr))
 
         ErrorTextBox.AppendText(ex.Message & CrLf)
-        ErrorTextBox.AppendText("Error code: " & Hex(ex.HResult) & " (" & New System.ComponentModel.Win32Exception(ex.HResult).Message & ")" & CrLf & CrLf)
+        ErrorTextBox.AppendText(String.Format(GetValueFromLanguageData("MainForm.ExceptionLogger_ErrorCodePara"), Hex(ex.HResult), New Win32Exception(ex.HResult).Message))
 
-        ErrorTextBox.AppendText("Please report this issue here: https://github.com/CodingWonders/DT-HotInstall/issues/new")
+        ErrorTextBox.AppendText(GetValueFromLanguageData("MainForm.ExceptionLogger_IssueReportLink"))
     End Sub
 End Class

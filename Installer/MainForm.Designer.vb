@@ -1005,7 +1005,6 @@ Partial Class MainForm
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "DISMTools Operating System Installation"
         Me.TopMost = True
         Me.ButtonContainerPanel.ResumeLayout(False)
         Me.PageContainerPanel.ResumeLayout(False)
