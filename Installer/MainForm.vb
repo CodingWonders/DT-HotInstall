@@ -79,6 +79,7 @@ Public Class MainForm
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Visible = False
         ChangeLanguage(My.Computer.Info.InstalledUICulture.TwoLetterISOLanguageName)
 
         ' Because of the DISM API, Windows 7 compatibility is out the window (no pun intended)
@@ -172,6 +173,7 @@ Public Class MainForm
 
         PictureBox3.Image = If(IsDarkMode, My.Resources.hotinstall_step3_dm, My.Resources.hotinstall_step3)
 
+        Visible = True
     End Sub
 
     ''' <summary>
