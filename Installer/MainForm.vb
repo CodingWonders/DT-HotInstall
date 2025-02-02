@@ -116,10 +116,9 @@ Public Class MainForm
         End If
 
         ' Get CPU architecture
-        Dim Proc_Searcher As ManagementObjectSearcher = New ManagementObjectSearcher("SELECT Architecture FROM Win32_Processor")
-        Dim Proc_Results As ManagementObjectCollection = Proc_Searcher.Get()
+        Dim Proc_Results As ManagementObjectCollection = GetResultsFromManagementQuery("SELECT Architecture FROM Win32_Processor")
         If Proc_Results IsNot Nothing Then
-            ComputerArchitecture = Proc_Results(0)("Architecture")
+            ComputerArchitecture = GetObjectValue(Proc_Results(0), "Architecture")
             Label6.Text = CastCPUArchitecture(ComputerArchitecture)
         End If
 

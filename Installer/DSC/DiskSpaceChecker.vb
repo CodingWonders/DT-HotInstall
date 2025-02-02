@@ -94,23 +94,6 @@ Public Class DiskSpaceChecker
 
 #Region "WQL Drive Information Functions/Methods"
 
-    Function GetResultsFromManagementQuery(ManagementQuery As String) As ManagementObjectCollection
-        Try
-            Dim MOS As ManagementObjectSearcher = New ManagementObjectSearcher(ManagementQuery)
-            Return MOS.Get()
-        Catch ex As Exception
-            Return Nothing
-        End Try
-        Return Nothing
-    End Function
-
-    Function GetObjectValue(Item As ManagementObject, PropertyOfInterest As String) As Object
-        If Item IsNot Nothing AndAlso PropertyOfInterest <> "" Then
-            Return Item(PropertyOfInterest)
-        End If
-        Return Nothing
-    End Function
-
     Sub ListObtainedDisks(DriveObjects As ManagementObjectCollection)
         If DriveObjects Is Nothing Then
             Throw New Exception("A null-valued object collection has been passed for the drive report")

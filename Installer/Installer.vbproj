@@ -120,6 +120,7 @@
     <Compile Include="Util\Converters.vb" />
     <Compile Include="Util\LanguageFileParser.vb" />
     <Compile Include="Util\Utilities.vb" />
+    <Compile Include="Util\WMIHelper.vb" />
     <Compile Include="WizardPage.vb" />
   </ItemGroup>
   <ItemGroup>
