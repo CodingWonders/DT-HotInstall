@@ -76,6 +76,8 @@ Public Class MainForm
         Label36.Text = GetValueFromLanguageData("MainForm.ErrorPanel_Header")
         Label37.Text = GetValueFromLanguageData("MainForm.ErrorPanel_Description")
         Label38.Text = GetValueFromLanguageData("MainForm.ErrorPanel_PossibleFixes")
+        ExportDrvsBtn.Text = GetValueFromLanguageData("MainForm.ExportDriversButton")
+        ExportDrvsFBD.Description = GetValueFromLanguageData("MainForm.ExportDriversFolderDialog")
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -296,6 +298,8 @@ Public Class MainForm
             ButtonContainerPanel.Visible = False
         End If
 
+        ExportDrvsBtn.Visible = (NewPage = WizardPage.Page.ImageInfoPage)
+
         CurrentWizardPage.InstallerWizardPage = NewPage
 
         BackButton.Enabled = Not (NewPage = WizardPage.Page.DisclaimerPage) And Not ((NewPage = WizardPage.Page.FinishPage) Or (NewPage = WizardPage.Page.FailurePage))
@@ -343,7 +347,7 @@ Public Class MainForm
     End Function
 
     Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        If InstallerBW.IsBusy Then
+        If InstallerBW.IsBusy OrElse ExportDrvsBW.IsBusy Then
             e.Cancel = True
             Beep()
             Exit Sub
@@ -714,5 +718,27 @@ Public Class MainForm
         ErrorTextBox.AppendText(String.Format(GetValueFromLanguageData("MainForm.ExceptionLogger_ErrorCodePara"), Hex(ex.HResult), New Win32Exception(ex.HResult).Message))
 
         ErrorTextBox.AppendText(GetValueFromLanguageData("MainForm.ExceptionLogger_IssueReportLink"))
+    End Sub
+
+    Private Sub ExportDrvsBtn_Click(sender As Object, e As EventArgs) Handles ExportDrvsBtn.Click
+        If ExportDrvsFBD.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Cursor = Cursors.WaitCursor
+            ButtonContainerPanel.Enabled = False
+            ExportDrvsBW.RunWorkerAsync()
+        End If
+    End Sub
+
+    Private Sub ExportDrvsBW_DoWork(sender As Object, e As DoWorkEventArgs) Handles ExportDrvsBW.DoWork
+        DriverHelper.ExportOnlineDrivers(ExportDrvsFBD.SelectedPath)
+    End Sub
+
+    Private Sub ExportDrvsBW_RunWorkerCompleted(sender As Object, e As RunWorkerCompletedEventArgs) Handles ExportDrvsBW.RunWorkerCompleted
+        If e.Error IsNot Nothing Then
+            MsgBox(e.Error.Message, vbOKOnly + vbExclamation, GetValueFromLanguageData("MainForm.DriverExporter_MessageTitle"))
+        Else
+            MsgBox(GetValueFromLanguageData("MainForm.DriverExporter_SuccessMessage"), vbOKOnly + vbInformation, GetValueFromLanguageData("MainForm.DriverExporter_MessageTitle"))
+        End If
+        Cursor = Cursors.Arrow
+        ButtonContainerPanel.Enabled = True
     End Sub
 End Class

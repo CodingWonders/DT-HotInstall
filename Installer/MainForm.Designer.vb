@@ -104,6 +104,9 @@ Partial Class MainForm
         Me.InstallerBW = New System.ComponentModel.BackgroundWorker()
         Me.BCDEditProcess = New System.Diagnostics.Process()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.ExportDrvsBtn = New System.Windows.Forms.Button()
+        Me.ExportDrvsFBD = New System.Windows.Forms.FolderBrowserDialog()
+        Me.ExportDrvsBW = New System.ComponentModel.BackgroundWorker()
         Me.ButtonContainerPanel.SuspendLayout()
         Me.PageContainerPanel.SuspendLayout()
         Me.ErrorPanel.SuspendLayout()
@@ -130,6 +133,7 @@ Partial Class MainForm
         'ButtonContainerPanel
         '
         Me.ButtonContainerPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(239, Byte), Integer), CType(CType(239, Byte), Integer), CType(CType(242, Byte), Integer))
+        Me.ButtonContainerPanel.Controls.Add(Me.ExportDrvsBtn)
         Me.ButtonContainerPanel.Controls.Add(Me.BackButton)
         Me.ButtonContainerPanel.Controls.Add(Me.NextButton)
         Me.ButtonContainerPanel.Controls.Add(Me.ExitButton)
@@ -987,6 +991,27 @@ Partial Class MainForm
         '
         Me.Timer1.Interval = 1000
         '
+        'ExportDrvsBtn
+        '
+        Me.ExportDrvsBtn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ExportDrvsBtn.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.ExportDrvsBtn.Location = New System.Drawing.Point(8, 6)
+        Me.ExportDrvsBtn.Name = "ExportDrvsBtn"
+        Me.ExportDrvsBtn.Size = New System.Drawing.Size(230, 23)
+        Me.ExportDrvsBtn.TabIndex = 1
+        Me.ExportDrvsBtn.Text = "Export system drivers..."
+        Me.ExportDrvsBtn.UseVisualStyleBackColor = True
+        Me.ExportDrvsBtn.Visible = False
+        '
+        'ExportDrvsFBD
+        '
+        Me.ExportDrvsFBD.Description = "Specify the path to export drivers to:"
+        Me.ExportDrvsFBD.RootFolder = System.Environment.SpecialFolder.MyComputer
+        '
+        'ExportDrvsBW
+        '
+        Me.ExportDrvsBW.WorkerReportsProgress = True
+        '
         'MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -1123,4 +1148,7 @@ Partial Class MainForm
     Friend WithEvents Label38 As System.Windows.Forms.Label
     Friend WithEvents Label37 As System.Windows.Forms.Label
     Friend WithEvents Label36 As System.Windows.Forms.Label
+    Friend WithEvents ExportDrvsBtn As System.Windows.Forms.Button
+    Friend WithEvents ExportDrvsFBD As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents ExportDrvsBW As System.ComponentModel.BackgroundWorker
 End Class

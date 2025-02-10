@@ -118,6 +118,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Util\Converters.vb" />
+    <Compile Include="Util\DriverHelper.vb" />
     <Compile Include="Util\LanguageFileParser.vb" />
     <Compile Include="Util\Utilities.vb" />
     <Compile Include="Util\WMIHelper.vb" />
