@@ -193,7 +193,7 @@ Public Class DiskSpaceChecker
             Dim SystemBootDrive As ManagementObjectCollection = GetResultsFromManagementQuery("SELECT * FROM Win32_LogicalDisk WHERE DriveType = 3 AND DeviceID LIKE " & Quote & Environment.GetEnvironmentVariable("HOMEDRIVE") & Quote)
             If SystemBootDrive IsNot Nothing Then
                 ' We have grabbed the system boot drive
-                progressMessage = "Getting size of disc image files..."
+                progressMessage = GetValueFromLanguageData("DiskSpaceChecker.DSC_GetSizeOfImageFiles")
                 BackgroundWorker1.ReportProgress(10)
                 Dim FolderSize As Long = GetDirectorySize(sourcePath, "")
                 ' Get the free space of the system boot drive, since we'll copy the files there
@@ -203,11 +203,11 @@ Public Class DiskSpaceChecker
                     Throw New Exception("There is not enough space to copy the disc image files to the system drive. Please free up some space and try again.")
                 End If
                 ' Get information about the installation image and compare the expanded sizes of all indexes with the total space of all fixed drives
-                progressMessage = "Getting image file information..."
+                progressMessage = GetValueFromLanguageData("DiskSpaceChecker.DSC_GetImageFileInfo")
                 BackgroundWorker1.ReportProgress(40)
                 Dim imgInfoCollection As DismImageInfoCollection = GetImageInformation(Path.Combine(sourcePath, "sources", "install.wim"))
                 If imgInfoCollection IsNot Nothing Then
-                    progressMessage = "Getting image names and sizes..."
+                    progressMessage = GetValueFromLanguageData("DiskSpaceChecker.DSC_GetImageNamesAndSizes")
                     BackgroundWorker1.ReportProgress(60)
                     ' Grab the image names and expanded sizes
                     Dim ImageNames As New List(Of String)
@@ -216,7 +216,7 @@ Public Class DiskSpaceChecker
                         ImageNames.Add(imgInfo.ImageName)
                         ImageSizes.Add(imgInfo.ImageSize)
                     Next
-                    progressMessage = "Comparing image sizes with free space..."
+                    progressMessage = GetValueFromLanguageData("DiskSpaceChecker.DSC_CompareSizes")
                     BackgroundWorker1.ReportProgress(80)
                     ListSpaceComparison(ImageNames, ImageSizes, SystemDrives)
                 End If
@@ -306,7 +306,7 @@ Public Class DiskSpaceChecker
 
     Private Sub BackgroundWorker1_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles BackgroundWorker1.DoWork
         InitializeReport()
-        progressMessage = "Getting system drives..."
+        progressMessage = GetValueFromLanguageData("DiskSpaceChecker.DSC_GetSysDrives")
         BackgroundWorker1.ReportProgress(5)
         Try
             GenerateDSCReportUsingWQL()     ' Let's make my database teacher happy!
@@ -349,6 +349,9 @@ Public Class DiskSpaceChecker
         If Utilities.IsWindowsVersionOrGreater(10, 0, 18362) Then Utilities.EnableDarkTitleBar(Handle, IsDarkMode)
         BackColor = If(IsDarkMode, Color.FromArgb(12, 12, 12), Color.FromArgb(246, 246, 249))
         ForeColor = If(IsDarkMode, Color.White, Color.Black)
+        Text = GetValueFromLanguageData("DiskSpaceChecker.WndTitle")
+        Label1.Text = GetValueFromLanguageData("DiskSpaceChecker.WndDesc")
+        Label2.Text = GetValueFromLanguageData("DiskSpaceChecker.DSC_GenericProgress")
         BackgroundWorker1.RunWorkerAsync()
     End Sub
 End Class
