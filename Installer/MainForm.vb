@@ -30,6 +30,8 @@ Public Class MainForm
     ' Restart Timer
     Dim TimeTaken As Integer
 
+    Dim ImageAlreadyVerified As Boolean
+
     Sub ChangeLanguage(LanguageCode As String)
         If Not File.Exists(Path.Combine(Application.StartupPath, "Languages", "lang_" & LanguageCode & ".ini")) Then
             LanguageCode = "en"
@@ -269,8 +271,12 @@ Public Class MainForm
                     Return False
                 End If
             Case Installer.WizardPage.Page.ImageInfoPage
+                If ImageAlreadyVerified Then Return True
+
                 If MsgBox(GetValueFromLanguageData("MainForm.VERIFY_ImageInfo_Question"), vbYesNo + vbQuestion, Text) = MsgBoxResult.No Then
                     Return False
+                Else
+                    ImageAlreadyVerified = True
                 End If
         End Select
         Return True
