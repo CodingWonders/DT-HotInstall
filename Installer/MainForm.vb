@@ -32,6 +32,9 @@ Public Class MainForm
 
     Dim ImageAlreadyVerified As Boolean
 
+    Dim ProgressInitialValue As Integer
+    Dim ProgressMaximumValue As Integer
+
     Sub ChangeLanguage(LanguageCode As String)
         If Not File.Exists(Path.Combine(Application.StartupPath, "Languages", "lang_" & LanguageCode & ".ini")) Then
             LanguageCode = "en"
@@ -466,14 +469,18 @@ Public Class MainForm
                                                                                 If progress.Current > 100 Then Exit Sub
                                                                                 DismProgressPercentage = progress.Current
                                                                                 ProgressMessage = MountString & " (" & DismProgressPercentage & "%)"
-                                                                                InstallerBW.ReportProgress(ProgressBar1.Value)
+                                                                                Dim newProgress As Integer = ProgressInitialValue + CInt((ProgressMaximumValue - ProgressInitialValue) * progress.Current / 100)
+                                                                                If newProgress > 100 Then Exit Sub
+                                                                                InstallerBW.ReportProgress(newProgress)
                                                                             End Sub)
             Else
                 DismApi.UnmountImage(MountDirectory, Commit, Sub(progress As DismProgress)
                                                                  If (progress.Current / 2) > 100 Then Exit Sub
                                                                  DismProgressPercentage = progress.Current / 2
                                                                  ProgressMessage = UnmountString & " (" & DismProgressPercentage & "%)"
-                                                                 InstallerBW.ReportProgress(ProgressBar1.Value)
+                                                                 Dim newProgress As Integer = ProgressInitialValue + CInt((ProgressMaximumValue - ProgressInitialValue) * (progress.Current / 2) / 100)
+                                                                 If newProgress > 100 Then Exit Sub
+                                                                 InstallerBW.ReportProgress(newProgress)
                                                              End Sub)
             End If
         Catch ex As Exception
@@ -599,6 +606,8 @@ Public Class MainForm
         CurrentStage = InstallationStage.InstallerStage.WIMMount
         ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_WIMMount")
         InstallerBW.ReportProgress(40)
+        ProgressInitialValue = 40
+        ProgressMaximumValue = 60
         UseWindowsImage(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT", "sources", "boot.wim"),
                         Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~WS"),
                         1, True)
@@ -621,7 +630,9 @@ Public Class MainForm
         End Try
         CurrentStage = InstallationStage.InstallerStage.WIMUnmount
         ProgressMessage = GetValueFromLanguageData("MainForm.ProgressMessage_WIMUnmount")
-        InstallerBW.ReportProgress(80)
+        InstallerBW.ReportProgress(70)
+        ProgressInitialValue = 70
+        ProgressMaximumValue = 95
         ' Unmount Windows image committing changes
         UseWindowsImage(Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~BT", "sources", "boot.wim"),
                         Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.Windows)), "$DISMTOOLS.~WS"),
