@@ -4,6 +4,7 @@ Imports Microsoft.VisualBasic.ControlChars
 Imports System.Management
 Imports System.ComponentModel
 Imports System.Drawing
+Imports System.Text.Encoding
 
 Public Class MainForm
 
@@ -34,6 +35,9 @@ Public Class MainForm
 
     Dim ProgressInitialValue As Integer
     Dim ProgressMaximumValue As Integer
+
+    Dim bootPath As String
+    Dim installPath As String
 
     Sub ChangeLanguage(LanguageCode As String)
         If Not File.Exists(Path.Combine(Application.StartupPath, "Languages", "lang_" & LanguageCode & ".ini")) Then
@@ -83,6 +87,7 @@ Public Class MainForm
         Label38.Text = GetValueFromLanguageData("MainForm.ErrorPanel_PossibleFixes")
         ExportDrvsBtn.Text = GetValueFromLanguageData("MainForm.ExportDriversButton")
         ExportDrvsFBD.Description = GetValueFromLanguageData("MainForm.ExportDriversFolderDialog")
+        GetImgInfoBtn.Text = GetValueFromLanguageData("MainForm.GetImageInformationButton")
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -100,8 +105,8 @@ Public Class MainForm
 
         VerifyInPages.AddRange(New WizardPage.Page() {WizardPage.Page.DisclaimerPage, WizardPage.Page.ImageInfoPage})
 
-        Dim bootPath As String = Path.Combine(Path.GetPathRoot(Application.StartupPath), "sources", "boot.wim")
-        Dim installPath As String = Path.Combine(Path.GetPathRoot(Application.StartupPath), "sources", "install.wim")
+        bootPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "sources", "boot.wim")
+        installPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "sources", "install.wim")
 
         If TestMode Or TestBCD Then
             bootPath = Path.Combine(Application.StartupPath, "sources", "boot.wim")
@@ -308,6 +313,7 @@ Public Class MainForm
         End If
 
         ExportDrvsBtn.Visible = (NewPage = WizardPage.Page.ImageInfoPage)
+        GetImgInfoBtn.Visible = (NewPage = WizardPage.Page.ImageInfoPage)
 
         CurrentWizardPage.InstallerWizardPage = NewPage
 
@@ -757,5 +763,69 @@ Public Class MainForm
         End If
         Cursor = Cursors.Arrow
         ButtonContainerPanel.Enabled = True
+    End Sub
+
+    Private Sub GetImgInfoBtn_Click(sender As Object, e As EventArgs) Handles GetImgInfoBtn.Click
+        Dim TargetInfoPath As String = Path.Combine(Environment.GetEnvironmentVariable("TEMP"), "imageinfo.txt")
+        Dim TextContents As String = ""
+        Cursor = Cursors.WaitCursor
+        Refresh()
+        Try
+            If File.Exists(TargetInfoPath) Then
+                File.Delete(TargetInfoPath)
+            End If
+            Dim imageInfoCollection As DismImageInfoCollection = GetImageInformation(installPath)
+            If imageInfoCollection IsNot Nothing Then
+                Dim imageCount As Integer = imageInfoCollection.Count
+                TextContents &= "Information summary for " & imageCount & " image(s):" & CrLf & CrLf
+                For Each imageInfo As DismImageInfo In imageInfoCollection
+                    TextContents &= String.Format("Image {0} of {1}:" & CrLf & CrLf &
+                                                  "    - Image name: {2}" & CrLf &
+                                                  "    - Image description: {3}" & CrLf &
+                                                  "    - Image size: {4} ({5})" & CrLf &
+                                                  "    - Architecture: {6}" & CrLf &
+                                                  "    - HAL: {7}" & CrLf &
+                                                  "    - Service Pack build: {8}" & CrLf &
+                                                  "    - Service Pack level: {9}" & CrLf &
+                                                  "    - Edition: {10}" & CrLf &
+                                                  "    - Installation Type: {11}" & CrLf &
+                                                  "    - Product type: {12}" & CrLf &
+                                                  "    - Product suite: {13}" & CrLf &
+                                                  "    - System root directory: {14}" & CrLf &
+                                                  "    - File count: {15} file(s) in {16} folder(s)" & CrLf &
+                                                  "    - Creation date: {17}" & CrLf &
+                                                  "    - Modification date: {18}" & CrLf &
+                                                  "    - Languages: {19}" & CrLf & CrLf,
+                                                  imageInfoCollection.IndexOf(imageInfo) + 1, imageCount,
+                                                  imageInfo.ImageName,
+                                                  imageInfo.ImageDescription,
+                                                  imageInfo.ImageSize, Converters.BytesToReadableSize(imageInfo.ImageSize),
+                                                  Casters.CastDismArchitecture(imageInfo.Architecture),
+                                                  imageInfo.Hal,
+                                                  imageInfo.ProductVersion.Revision,
+                                                  imageInfo.SpLevel,
+                                                  imageInfo.EditionId,
+                                                  imageInfo.InstallationType,
+                                                  imageInfo.ProductType,
+                                                  imageInfo.ProductSuite,
+                                                  imageInfo.SystemRoot,
+                                                  imageInfo.CustomizedInfo.FileCount, imageInfo.CustomizedInfo.DirectoryCount,
+                                                  imageInfo.CustomizedInfo.CreatedTime,
+                                                  imageInfo.CustomizedInfo.ModifiedTime,
+                                                  String.Join(", ", imageInfo.Languages.Select(Function(language) language.DisplayName)))
+                Next
+                File.WriteAllText(TargetInfoPath, TextContents, UTF8)
+            End If
+        Catch ex As Exception
+
+        Finally
+            Cursor = Cursors.Arrow
+            If File.Exists(TargetInfoPath) Then
+                Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+                                           "system32",
+                                           "notepad.exe"),
+                                       TargetInfoPath)
+            End If
+        End Try
     End Sub
 End Class

@@ -25,6 +25,8 @@ Partial Class MainForm
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
         Me.ButtonContainerPanel = New System.Windows.Forms.Panel()
+        Me.GetImgInfoBtn = New System.Windows.Forms.Button()
+        Me.ExportDrvsBtn = New System.Windows.Forms.Button()
         Me.BackButton = New System.Windows.Forms.Button()
         Me.NextButton = New System.Windows.Forms.Button()
         Me.ExitButton = New System.Windows.Forms.Button()
@@ -104,7 +106,6 @@ Partial Class MainForm
         Me.InstallerBW = New System.ComponentModel.BackgroundWorker()
         Me.BCDEditProcess = New System.Diagnostics.Process()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
-        Me.ExportDrvsBtn = New System.Windows.Forms.Button()
         Me.ExportDrvsFBD = New System.Windows.Forms.FolderBrowserDialog()
         Me.ExportDrvsBW = New System.ComponentModel.BackgroundWorker()
         Me.ButtonContainerPanel.SuspendLayout()
@@ -133,6 +134,7 @@ Partial Class MainForm
         'ButtonContainerPanel
         '
         Me.ButtonContainerPanel.BackColor = System.Drawing.Color.FromArgb(CType(CType(239, Byte), Integer), CType(CType(239, Byte), Integer), CType(CType(242, Byte), Integer))
+        Me.ButtonContainerPanel.Controls.Add(Me.GetImgInfoBtn)
         Me.ButtonContainerPanel.Controls.Add(Me.ExportDrvsBtn)
         Me.ButtonContainerPanel.Controls.Add(Me.BackButton)
         Me.ButtonContainerPanel.Controls.Add(Me.NextButton)
@@ -142,6 +144,30 @@ Partial Class MainForm
         Me.ButtonContainerPanel.Name = "ButtonContainerPanel"
         Me.ButtonContainerPanel.Size = New System.Drawing.Size(784, 36)
         Me.ButtonContainerPanel.TabIndex = 0
+        '
+        'GetImgInfoBtn
+        '
+        Me.GetImgInfoBtn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GetImgInfoBtn.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.GetImgInfoBtn.Location = New System.Drawing.Point(244, 6)
+        Me.GetImgInfoBtn.Name = "GetImgInfoBtn"
+        Me.GetImgInfoBtn.Size = New System.Drawing.Size(230, 23)
+        Me.GetImgInfoBtn.TabIndex = 1
+        Me.GetImgInfoBtn.Text = "Get image information"
+        Me.GetImgInfoBtn.UseVisualStyleBackColor = True
+        Me.GetImgInfoBtn.Visible = False
+        '
+        'ExportDrvsBtn
+        '
+        Me.ExportDrvsBtn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ExportDrvsBtn.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.ExportDrvsBtn.Location = New System.Drawing.Point(8, 6)
+        Me.ExportDrvsBtn.Name = "ExportDrvsBtn"
+        Me.ExportDrvsBtn.Size = New System.Drawing.Size(230, 23)
+        Me.ExportDrvsBtn.TabIndex = 1
+        Me.ExportDrvsBtn.Text = "Export system drivers..."
+        Me.ExportDrvsBtn.UseVisualStyleBackColor = True
+        Me.ExportDrvsBtn.Visible = False
         '
         'BackButton
         '
@@ -991,18 +1017,6 @@ Partial Class MainForm
         '
         Me.Timer1.Interval = 1000
         '
-        'ExportDrvsBtn
-        '
-        Me.ExportDrvsBtn.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ExportDrvsBtn.FlatStyle = System.Windows.Forms.FlatStyle.System
-        Me.ExportDrvsBtn.Location = New System.Drawing.Point(8, 6)
-        Me.ExportDrvsBtn.Name = "ExportDrvsBtn"
-        Me.ExportDrvsBtn.Size = New System.Drawing.Size(230, 23)
-        Me.ExportDrvsBtn.TabIndex = 1
-        Me.ExportDrvsBtn.Text = "Export system drivers..."
-        Me.ExportDrvsBtn.UseVisualStyleBackColor = True
-        Me.ExportDrvsBtn.Visible = False
-        '
         'ExportDrvsFBD
         '
         Me.ExportDrvsFBD.Description = "Specify the path to export drivers to:"
@@ -1151,4 +1165,5 @@ Partial Class MainForm
     Friend WithEvents ExportDrvsBtn As System.Windows.Forms.Button
     Friend WithEvents ExportDrvsFBD As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents ExportDrvsBW As System.ComponentModel.BackgroundWorker
+    Friend WithEvents GetImgInfoBtn As System.Windows.Forms.Button
 End Class
