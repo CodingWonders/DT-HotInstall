@@ -780,23 +780,25 @@ Public Class MainForm
                 TextContents &= "Information summary for " & imageCount & " image(s):" & CrLf & CrLf
                 For Each imageInfo As DismImageInfo In imageInfoCollection
                     TextContents &= String.Format("Image {0} of {1}:" & CrLf & CrLf &
-                                                  "    - Image name: {2}" & CrLf &
-                                                  "    - Image description: {3}" & CrLf &
-                                                  "    - Image size: {4} ({5})" & CrLf &
-                                                  "    - Architecture: {6}" & CrLf &
-                                                  "    - HAL: {7}" & CrLf &
-                                                  "    - Service Pack build: {8}" & CrLf &
-                                                  "    - Service Pack level: {9}" & CrLf &
-                                                  "    - Edition: {10}" & CrLf &
-                                                  "    - Installation Type: {11}" & CrLf &
-                                                  "    - Product type: {12}" & CrLf &
-                                                  "    - Product suite: {13}" & CrLf &
-                                                  "    - System root directory: {14}" & CrLf &
-                                                  "    - File count: {15} file(s) in {16} folder(s)" & CrLf &
-                                                  "    - Creation date: {17}" & CrLf &
-                                                  "    - Modification date: {18}" & CrLf &
-                                                  "    - Languages: {19}" & CrLf & CrLf,
+                                                  "    - Image version: {2}" & CrLf &
+                                                  "    - Image name: {3}" & CrLf &
+                                                  "    - Image description: {4}" & CrLf &
+                                                  "    - Image size: {5} ({6})" & CrLf &
+                                                  "    - Architecture: {7}" & CrLf &
+                                                  "    - HAL: {8}" & CrLf &
+                                                  "    - Service Pack build: {9}" & CrLf &
+                                                  "    - Service Pack level: {10}" & CrLf &
+                                                  "    - Edition: {11}" & CrLf &
+                                                  "    - Installation Type: {12}" & CrLf &
+                                                  "    - Product type: {13}" & CrLf &
+                                                  "    - Product suite: {14}" & CrLf &
+                                                  "    - System root directory: {15}" & CrLf &
+                                                  "    - File count: {16} file(s) in {17} folder(s)" & CrLf &
+                                                  "    - Creation date: {18}" & CrLf &
+                                                  "    - Modification date: {19}" & CrLf &
+                                                  "    - Languages: {20}" & CrLf & CrLf,
                                                   imageInfoCollection.IndexOf(imageInfo) + 1, imageCount,
+                                                  imageInfo.ProductVersion.ToString(),
                                                   imageInfo.ImageName,
                                                   imageInfo.ImageDescription,
                                                   imageInfo.ImageSize, Converters.BytesToReadableSize(imageInfo.ImageSize),
