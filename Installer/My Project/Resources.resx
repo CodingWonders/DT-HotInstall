@@ -163,4 +163,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   <data name="hotinstall_step3_dm" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\hotinstall_step3_dm.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="logo_aboutdlg_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\splashscreen\logo_aboutdlg_dark.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

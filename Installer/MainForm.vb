@@ -185,6 +185,8 @@ Public Class MainForm
         PictureBox3.Image = If(IsDarkMode, My.Resources.hotinstall_step3_dm, My.Resources.hotinstall_step3)
 
         Visible = True
+        SplashForm.Label2.Visible = False
+        Focus()
     End Sub
 
     ''' <summary>
@@ -326,7 +328,11 @@ Public Class MainForm
             BackButton.Enabled = False
             NextButton.Enabled = False
             ExitButton.Enabled = False
-            ControlBox = False
+            'ControlBox = False
+            Dim hMenu As IntPtr = NativeMethods.GetSystemMenu(Handle, False)
+            If Not hMenu = IntPtr.Zero Then
+                NativeMethods.EnableMenuItem(hMenu, NativeMethods.SC_CLOSE, NativeMethods.MF_BYCOMMAND Or NativeMethods.MF_GRAYED Or NativeMethods.MF_DISABLED)
+            End If
             InstallerBW.RunWorkerAsync()
         End If
 
@@ -664,10 +670,12 @@ Public Class MainForm
 
     Private Sub InstallerBW_RunWorkerCompleted(sender As Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles InstallerBW.RunWorkerCompleted
         If e.Error IsNot Nothing Then
+            SplashForm.SetupSuccess = False
             If e.Error.Message = "Preparation Finished" Then
                 SlideshowTimer.Enabled = False
                 Timer1.Enabled = True
                 ChangePage(CurrentWizardPage.InstallerWizardPage + 1)
+                SplashForm.SetupSuccess = True
                 Exit Sub
             Else
                 LogErrorMessage(e.Error, CurrentStage)
@@ -677,14 +685,6 @@ Public Class MainForm
     End Sub
 
     Private Sub RestartButton_Click(sender As Object, e As EventArgs) Handles RestartButton.Click
-        If Not TestMode Then
-            Dim Shutter As New Process
-            Shutter.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "system32", "shutdown.exe")
-            Shutter.StartInfo.Arguments = "/r /t 0"
-            Shutter.StartInfo.CreateNoWindow = True
-            Shutter.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
-            Shutter.Start()
-        End If
         Close()
     End Sub
 

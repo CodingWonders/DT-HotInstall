@@ -1,14 +1,19 @@
 ﻿Imports System.IO
 
-Public Class Form1
+Public Class SplashForm
 
     Dim BackgroundPicture As Image
     Dim InstallerProcess As New Process()
 
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Public SetupSuccess As Boolean
+
+    Public TestMode As Boolean = Environment.GetCommandLineArgs().Contains("/test")
+    Public TestBCD As Boolean = Environment.GetCommandLineArgs().Contains("/bcdtest")
+
+    Private Sub SplashForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ' Load background image
-        If File.Exists(Application.StartupPath & "\Resources\background.jpg") Then
-            BackgroundPicture = Image.FromFile(Application.StartupPath & "\Resources\background.jpg")
+        If File.Exists(Application.StartupPath & "\Resources\SplashScreen\background.jpg") Then
+            BackgroundPicture = Image.FromFile(Application.StartupPath & "\Resources\SplashScreen\background.jpg")
             ResizeImage()
         End If
         ' Change status font size
@@ -18,18 +23,20 @@ Public Class Form1
         Else
             Label2.Font = New Font("Segoe UI", 24)
         End If
-        If File.Exists(Application.StartupPath & "\Installer\Installer.exe") Then
-            VersionLabel.Text = VersionLabel.Text.Replace("<version>", My.Application.Info.Version.ToString()).Trim() & "_" & RetrieveLinkerTimestamp(My.Application.Info.DirectoryPath & "\Installer\Installer.exe").ToString("yyMMdd-HHmm")
+        If File.Exists(Application.StartupPath & "\setup.exe") Then
+            VersionLabel.Text = VersionLabel.Text.Replace("<version>", My.Application.Info.Version.ToString()).Trim() & "_" & RetrieveLinkerTimestamp(My.Application.Info.DirectoryPath & "\setup.exe").ToString("yyMMdd-HHmm")
         Else
             VersionLabel.Text = VersionLabel.Text.Replace("<version>", My.Application.Info.Version.ToString()).Trim() & "_" & RetrieveLinkerTimestamp(My.Application.Info.DirectoryPath & "\" & My.Application.Info.AssemblyName & ".exe").ToString("yyMMdd-HHmm")
         End If
 
         VersionLabel.Visible = File.Exists(Path.Combine(Application.StartupPath, "testbuild"))
 
-        InstallerBW.RunWorkerAsync()
+        Refresh()
+        MainForm.ShowDialog(Me)
+        Close()
     End Sub
 
-    Private Sub Form1_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+    Private Sub SplashForm_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         If Width > 800 AndAlso Height > 600 Then
             BackgroundImageLayout = ImageLayout.Stretch
         ElseIf Width < 800 AndAlso Height < 600 Then
@@ -69,29 +76,6 @@ Public Class Form1
         croppedImage.Dispose() ' Dispose of the intermediate cropped image
     End Sub
 
-    Private Sub InstallerBW_DoWork(sender As Object, e As System.ComponentModel.DoWorkEventArgs) Handles InstallerBW.DoWork
-        If File.Exists(Application.StartupPath & "\Installer\Installer.exe") Then
-            InstallerProcess.StartInfo.WorkingDirectory = Path.Combine(Application.StartupPath, "Installer")
-            InstallerProcess.StartInfo.FileName = Path.Combine(Application.StartupPath, "Installer", "Installer.exe")
-            If Environment.GetCommandLineArgs().Contains("/test") Then InstallerProcess.StartInfo.Arguments = "/bcdtest"
-            Threading.Thread.Sleep(500)
-            InstallerBW.ReportProgress(0)
-            InstallerProcess.Start()
-            InstallerProcess.WaitForExit()
-        End If
-    End Sub
-
-    Private Sub InstallerBW_ProgressChanged(sender As Object, e As System.ComponentModel.ProgressChangedEventArgs) Handles InstallerBW.ProgressChanged
-        Label2.Visible = False
-    End Sub
-
-    Private Sub InstallerBW_RunWorkerCompleted(sender As Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles InstallerBW.RunWorkerCompleted
-        If InstallerProcess.ExitCode = 0 Then
-            Close()
-        End If
-
-    End Sub
-
     Function RetrieveLinkerTimestamp(ByVal filePath As String) As DateTime
         Const PeHeaderOffset As Integer = 60
         Const LinkerTimestampOffset As Integer = 8
@@ -111,4 +95,21 @@ Public Class Form1
         dt = TimeZoneInfo.ConvertTimeFromUtc(dt, tz)
         Return dt
     End Function
+
+    Private Sub SplashForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        If SetupSuccess Then
+            Label2.Text = "Setup will continue after restarting your computer..."
+            Label2.Visible = True
+            Refresh()
+            Threading.Thread.Sleep(1000)
+            If Not TestMode Then
+                Dim Shutter As New Process
+                Shutter.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "system32", "shutdown.exe")
+                Shutter.StartInfo.Arguments = "/r /t 0"
+                Shutter.StartInfo.CreateNoWindow = True
+                Shutter.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+                Shutter.Start()
+            End If
+        End If
+    End Sub
 End Class

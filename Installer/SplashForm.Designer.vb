@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Form1
+Partial Class SplashForm
     Inherits System.Windows.Forms.Form
 
     'Form reemplaza a Dispose para limpiar la lista de componentes.
@@ -25,7 +25,6 @@ Partial Class Form1
         Me.VersionLabel = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-        Me.InstallerBW = New System.ComponentModel.BackgroundWorker()
         Me.Label2 = New System.Windows.Forms.Label()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -56,7 +55,7 @@ Partial Class Form1
         'PictureBox1
         '
         Me.PictureBox1.BackColor = System.Drawing.Color.Transparent
-        Me.PictureBox1.Image = Global.SplashScreen.My.Resources.Resources.logo_aboutdlg_dark
+        Me.PictureBox1.Image = Global.Installer.My.Resources.Resources.logo_aboutdlg_dark
         Me.PictureBox1.Location = New System.Drawing.Point(4, -4)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(267, 97)
@@ -64,23 +63,19 @@ Partial Class Form1
         Me.PictureBox1.TabIndex = 2
         Me.PictureBox1.TabStop = False
         '
-        'InstallerBW
-        '
-        Me.InstallerBW.WorkerReportsProgress = True
-        '
         'Label2
         '
         Me.Label2.Anchor = System.Windows.Forms.AnchorStyles.None
         Me.Label2.BackColor = System.Drawing.Color.Transparent
         Me.Label2.Font = New System.Drawing.Font("Segoe UI", 18.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(264, 352)
+        Me.Label2.Location = New System.Drawing.Point(90, 352)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(496, 64)
+        Me.Label2.Size = New System.Drawing.Size(845, 64)
         Me.Label2.TabIndex = 4
         Me.Label2.Text = "Setup is starting..."
         Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
-        'Form1
+        'SplashForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -99,7 +94,7 @@ Partial Class Form1
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.MinimumSize = New System.Drawing.Size(1024, 768)
-        Me.Name = "Form1"
+        Me.Name = "SplashForm"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -112,7 +107,6 @@ Partial Class Form1
     Friend WithEvents VersionLabel As System.Windows.Forms.Label
     Friend WithEvents PictureBox1 As System.Windows.Forms.PictureBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents InstallerBW As System.ComponentModel.BackgroundWorker
     Friend WithEvents Label2 As System.Windows.Forms.Label
 
 End Class

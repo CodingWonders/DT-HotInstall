@@ -94,6 +94,12 @@
     <Compile Include="DSC\DiskSpaceChecker.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="SplashForm.Designer.vb">
+      <DependentUpon>SplashForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="SplashForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="InstallationStage.vb" />
     <Compile Include="MainForm.vb">
       <SubType>Form</SubType>
@@ -121,6 +127,7 @@
     <Compile Include="Util\Converters.vb" />
     <Compile Include="Util\DriverHelper.vb" />
     <Compile Include="Util\LanguageFileParser.vb" />
+    <Compile Include="Util\NativeMethods.vb" />
     <Compile Include="Util\Utilities.vb" />
     <Compile Include="Util\WMIHelper.vb" />
     <Compile Include="WizardPage.vb" />
@@ -128,6 +135,9 @@
   <ItemGroup>
     <EmbeddedResource Include="DSC\DiskSpaceChecker.resx">
       <DependentUpon>DiskSpaceChecker.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SplashForm.resx">
+      <DependentUpon>SplashForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
@@ -179,14 +189,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo.ico" />
+    <Content Include="Resources\SplashScreen\background.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\SplashScreen\logo_aboutdlg_dark.png" />
     <None Include="Resources\hotinstall_step3_dm.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY "$(TargetDir)\*" "$(SolutionDir)SplashScreen\bin\Debug\Installer" /cehyi
-IF EXIST "$(SolutionDir)SplashScreen\bin\Debug\Installer\*.tmp" (
-	DEL "$(SolutionDir)SplashScreen\bin\Debug\Installer\*.tmp" /f /q
-)</PostBuildEvent>
+    <PostBuildEvent>IF EXIST "$(TargetDir)\*.tmp" (
+	DEL "$(TargetDir)\*.tmp" /f /q
+)
+echo &gt; "$(TargetDir)testbuild"</PostBuildEvent>
   </PropertyGroup>
 </Project>

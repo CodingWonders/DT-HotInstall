@@ -1042,9 +1042,7 @@ Partial Class MainForm
         Me.MinimumSize = New System.Drawing.Size(800, 600)
         Me.Name = "MainForm"
         Me.ShowIcon = False
-        Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.TopMost = True
         Me.ButtonContainerPanel.ResumeLayout(False)
         Me.PageContainerPanel.ResumeLayout(False)
         Me.ErrorPanel.ResumeLayout(False)
