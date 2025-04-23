@@ -783,7 +783,7 @@ Public Class MainForm
                                                   "    - Image version: {2}" & CrLf &
                                                   "    - Image name: {3}" & CrLf &
                                                   "    - Image description: {4}" & CrLf &
-                                                  "    - Image size: {5} ({6})" & CrLf &
+                                                  "    - Image size: {5} bytes ({6})" & CrLf &
                                                   "    - Architecture: {7}" & CrLf &
                                                   "    - HAL: {8}" & CrLf &
                                                   "    - Service Pack build: {9}" & CrLf &
