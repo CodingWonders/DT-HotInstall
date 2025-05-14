@@ -98,10 +98,9 @@ Public Class SplashForm
 
     Private Sub SplashForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If SetupSuccess Then
-            Label2.Text = "Setup will continue after restarting your computer..."
+            Label2.Text = "Setup will continue after restarting your computer"
             Label2.Visible = True
             Refresh()
-            Threading.Thread.Sleep(1000)
             If Not TestMode Then
                 Dim Shutter As New Process
                 Shutter.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "system32", "shutdown.exe")
