@@ -59,7 +59,7 @@
       <HintPath>..\packages\ini-parser.2.5.2\lib\net20\INIFileParser.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Dism, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5bba90053b345501, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Dism.3.3.12\lib\net40\Microsoft.Dism.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\packages\Microsoft.Dism.3.3.12\lib\net40\Microsoft.Dism.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -201,6 +201,11 @@
     <PostBuildEvent>IF EXIST "$(TargetDir)\*.tmp" (
 	DEL "$(TargetDir)\*.tmp" /f /q
 )
-echo &gt; "$(TargetDir)testbuild"</PostBuildEvent>
+break &gt; "$(TargetDir)testbuild"
+
+IF EXIST "$(ProjectDir)..\CopyOutput.ps1" (
+	CD "$(ProjectDir).."
+	"%25WINDIR%25\system32\WindowsPowerShell\v1.0\powershell.exe" -ExecutionPolicy Bypass -File "$(ProjectDir)..\CopyOutput.ps1"
+)</PostBuildEvent>
   </PropertyGroup>
 </Project>

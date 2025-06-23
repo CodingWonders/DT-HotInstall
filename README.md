@@ -1,9 +1,6 @@
-# DT-HotInstall
+# HotInstall
 
 **HotInstall** is an operating system installer that prepares your computer to boot to the DISMTools Preinstallation Environment from within full Windows environments.
-
-> [!NOTE]
-> This is in experimental stages.
 
 ## How does it work?
 
