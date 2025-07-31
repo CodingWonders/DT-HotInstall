@@ -2,6 +2,9 @@
 
 **HotInstall** is an operating system installer that prepares your computer to boot to the DISMTools Preinstallation Environment from within full Windows environments.
 
+> [!NOTE]
+> HotInstall is now part of the DISMTools repository, and no changes will be made to this repository. Further changes to HotInstall will be present in the mainline DISMTools repository.
+
 ## How does it work?
 
 1. HotInstall copies all files of the disc image, minus the installation image (`install.wim`), to your local disk
